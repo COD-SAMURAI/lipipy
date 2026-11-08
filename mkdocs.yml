@@ -1,0 +1,23 @@
+site_name: lipipy
+site_description: Readable, verified-from-scratch ML, DL and research implementations.
+repo_url: https://github.com/COD-SAMURAI/lipipy
+theme:
+  name: material
+  features: [navigation.sections, content.code.copy]
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.superfences
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+nav:
+  - Home: index.md
+  - Algorithms:
+      - Linear Regression: algorithms/linear_regression.md

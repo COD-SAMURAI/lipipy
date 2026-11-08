@@ -1,0 +1,54 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lipipy"
+version = "0.1.0.dev0"
+description = "Readable, verified-from-scratch implementations of ML, DL and modern research architectures."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "COD-SAMURAI" }]
+keywords = ["machine-learning", "deep-learning", "from-scratch", "research", "education"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+ml = []
+dl = ["torch>=2.2"]
+all = ["lipipy[ml,dl]"]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff>=0.6",
+    "scikit-learn>=1.4",
+]
+docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.25"]
+
+[project.urls]
+Homepage = "https://github.com/COD-SAMURAI/lipipy"
+Issues = "https://github.com/COD-SAMURAI/lipipy/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lipipy"]
+
+[tool.pytest.ini_options]
+testpaths = ["src", "tests"]
+addopts = "-ra --doctest-modules"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "NPY"]
+ignore = ["N802", "N803", "N806"]  # allow ML-conventional X, W names
+
