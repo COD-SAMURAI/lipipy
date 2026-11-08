@@ -4,10 +4,11 @@ Subpackages
 -----------
 core       Shared base classes, input validation, metrics.
 ml         Classic machine learning (NumPy only).
+ai         Classical AI: search, logic, planning, reasoning under uncertainty.
 dl         Deep learning building blocks (PyTorch, install ``lipipy[dl]``).
 research   Modern architectures from recent papers.
 rl         Reinforcement learning.
-agents     LLM agents, tool use and reasoning loops.
+agents     LLM agents, reasoning, and AGI research directions.
 interpret  Interpretability and analysis tools.
 """
 
