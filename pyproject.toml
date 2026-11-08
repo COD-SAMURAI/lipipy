@@ -7,8 +7,8 @@ name = "lipipy"
 version = "0.1.0.dev0"
 description = "Readable, verified-from-scratch implementations of ML, DL and modern research architectures."
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [{ name = "COD-SAMURAI" }]
 keywords = ["machine-learning", "deep-learning", "from-scratch", "research", "education"]
@@ -30,6 +30,9 @@ dev = [
     "pytest-cov>=5",
     "ruff>=0.6",
     "scikit-learn>=1.4",
+    "matplotlib>=3.8",
+    "nbconvert>=7.16",
+    "ipykernel>=6.29",
 ]
 docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.25"]
 

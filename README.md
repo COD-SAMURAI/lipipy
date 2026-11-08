@@ -16,8 +16,15 @@ starting point for your own variant of an architecture.
 ## Install
 
 ```bash
-pip install -e ".[dev]"      # from a clone, with test tools
-pip install -e ".[dl]"       # adds PyTorch for the deep learning modules
+make dev                     # creates .venv and installs lipipy with dev tools
+make test                    # runs the test suite
+```
+
+Or by hand:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"      # add ",dl" for the PyTorch modules
 ```
 
 ## Quick start
@@ -68,4 +75,4 @@ AI/ML club at The National Institute of Engineering, Mysore.
 
 ## License
 
-MIT
+Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).

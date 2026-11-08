@@ -1,15 +1,14 @@
 # Contributing to lipipy
 
-Thanks for helping! lipipy values **correctness and readability over feature count**.
+Thanks for helping! By contributing you agree your work is licensed under the
+Apache License 2.0 (see LICENSE). lipipy values **correctness and readability over feature count**.
 
 ## Setup
 
 ```bash
 git clone https://github.com/COD-SAMURAI/lipipy && cd lipipy
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-pytest
-ruff check . && ruff format --check .
+make dev        # creates .venv and installs lipipy[dev]
+make check      # lint + format check + tests (same as CI)
 ```
 
 ## Definition of done for a new algorithm
