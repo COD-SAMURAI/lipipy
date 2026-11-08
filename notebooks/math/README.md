@@ -1,0 +1,108 @@
+# Mathematics formula notes
+
+A formula reference that starts with school algebra and the first-semester engineering
+maths syllabus and builds up to the equations behind today's AI: transformers, diffusion
+models, RLHF/DPO, state-space models and the theory used to reason about AGI.
+
+**These notebooks are notes, not code.** Each one lists formulas with short explanations.
+Where a formula is used later in ML, it carries an **ML note**.
+
+## How the files are arranged
+
+* Files are numbered in learning order. Each file lists its **prerequisites** by number,
+  so you can always go back to the file a formula depends on.
+* Every file starts with the same header: **Level**, **Typical semester**,
+  **Prerequisites** and where it is **used later** (or which `lipipy` package it matches).
+* Inside a file, sections go from basic to advanced, one notebook cell per section.
+* Semester labels follow a typical Indian B.E./B.Tech syllabus (for example VTU-style
+  Engineering Mathematics I–IV). Exact placement varies between universities.
+
+Levels used: **Pre-fundamentals** → **Fundamentals** → **Intermediate** → **Advanced** →
+**Modern** → **Research frontier**.
+
+## Stage 1 · Pre-fundamentals and Semester 1–2 core
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 01 | [Algebra, Trigonometry and Pre-Calculus](01_algebra_trigonometry_precalculus.ipynb) | Pre-fundamentals | School (Class 11–12) and the first weeks of Semester 1 | Exponents and logarithms; Algebraic identities; Quadratic equations; Sequences: arithmetic, geometric, harmonic; Binomial theorem, permutations and combinations; Trigonometric basics; Trigonometric identities; Hyperbolic functions; Inequalities; Coordinate geometry |
+| 02 | [Differential Calculus](02_differential_calculus.ipynb) | Fundamentals | Semester 1 (Engineering Mathematics I) | Limits; Definition of the derivative; Rules of differentiation; Standard derivatives; Derivatives of ML activation functions; Higher-order derivatives and Leibniz's theorem; Mean value theorems; Taylor and Maclaurin series; Applications: tangents, extrema, curvature; Partial differentiation; Jacobians; Taylor series in two variables and extrema; Errors and approximations |
+| 03 | [Integral Calculus](03_integral_calculus.ipynb) | Fundamentals | Semester 1–2 (Engineering Mathematics I and II) | Standard indefinite integrals; Techniques of integration; Definite integrals and properties; Reduction formulas (Wallis); Improper integrals and special functions; Applications of single integrals; Multiple integrals |
+| 04 | [Sequences, Series and Fourier Series](04_sequences_and_series.ipynb) | Fundamentals | Semester 1–3 (infinite series in Maths I/II, Fourier series in Maths III) | Sequences and convergence; Tests for convergence of $\sum a_n$; Power series; Fourier series (period $2L$); Complex form and Parseval; Harmonic analysis (from tabulated data) |
+| 05 | [Ordinary and Partial Differential Equations](05_differential_equations.ipynb) | Fundamentals → Intermediate | Semester 1–3 (first-order ODEs in Maths I, higher-order ODEs in Maths II, PDEs in Maths III) | First-order ODEs; Applications of first-order ODEs; Higher-order linear ODEs with constant coefficients; Mechanical and electrical oscillations; Series solutions and special functions; Systems of ODEs; Partial differential equations: formation and first order; Second-order PDEs; Stochastic differential equations (bridge to modern ML) |
+| 06 | [Linear Algebra](06_linear_algebra.ipynb) | Fundamentals → Intermediate | Semester 1 (matrices, rank, eigenvalues) and Semester 3–4 (vector spaces, linear transformations) | Vectors; Matrix operations; Determinants and inverse; Rank and systems of linear equations; Vector spaces; Eigenvalues and eigenvectors; Quadratic forms and definiteness; Matrix decompositions; Matrix norms and conditioning; Linear transformations; Kronecker product and vectorization; Positive-definite kernels |
+| 07 | [Vector Calculus](07_vector_calculus.ipynb) | Intermediate | Semester 2 (Engineering Mathematics II) | Vector differentiation; Del operator: gradient, divergence, curl, Laplacian; Vector identities; Line, surface and volume integrals; Integral theorems; Curvilinear coordinates; Bridge to ML |
+
+## Stage 2 · Semester 3–4 engineering mathematics
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 08 | [Complex Numbers and Complex Analysis](08_complex_analysis.ipynb) | Intermediate | Semester 1 (complex numbers) and Semester 4 (complex analysis) | Complex numbers; Analytic functions and Cauchy-Riemann equations; Elementary complex functions; Conformal and bilinear transformations; Complex integration; Taylor and Laurent series; Residues |
+| 09 | [Integral Transforms: Laplace, Fourier and Z](09_transforms.ipynb) | Intermediate | Semester 3 (Engineering Mathematics III) and signals and systems courses | Laplace transform: definition and standard transforms; Laplace transform properties; Inverse Laplace and solving ODEs; Fourier transform; Discrete Fourier transform and FFT; Z-transform; Other transforms worth knowing |
+| 10 | [Numerical Methods](10_numerical_methods.ipynb) | Intermediate | Semester 3–4 (Numerical Methods, often part of Maths III/IV) | Errors; Roots of equations $f(x) = 0$; Linear systems; Finite differences and interpolation; Numerical differentiation; Numerical integration (quadrature); Numerical solution of ODEs $y' = f(x,y)$; Numerical PDEs; Curve fitting (least squares) |
+| 11 | [Probability Theory](11_probability.ipynb) | Fundamentals → Intermediate | Semester 3–4 (Probability and Statistics) | Axioms and basic rules; Conditional probability, independence, Bayes; Random variables; Discrete distributions; Continuous distributions; Multivariate Gaussian; Joint distributions and transformations; Inequalities and limit theorems; Stochastic processes; Sampling methods |
+| 12 | [Statistics, Estimation and Time Series](12_statistics.ipynb) | Intermediate | Semester 3–4 (Probability and Statistics), plus elective statistics courses | Descriptive statistics; Correlation and regression; Sampling distributions; Point estimation; Bayesian estimation; Interval estimation; Hypothesis testing; Linear models (statistical view); Time series; Spatial statistics |
+| 13 | [Discrete Mathematics and Graph Theory](13_discrete_mathematics.ipynb) | Fundamentals → Intermediate | Semester 3–4 (Discrete Mathematical Structures, for CS/IS branches) | Sets, relations and functions; Propositional and predicate logic; Proof techniques; Combinatorics; Recurrence relations and generating functions; Asymptotic notation; Graph theory basics; Graph matrices; Graph algorithms (with complexity); Algebraic structures |
+
+## Stage 3 · Semester 5–7: maths that ML is built on
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 14 | [Information Theory](14_information_theory.ipynb) | Intermediate | Semester 5–6 (Information Theory and Coding, or Digital Communication) | Self-information and entropy; Joint, conditional and mutual information; Divergences between distributions; Source coding and compression; Channel capacity; Rate-distortion theory; Information theory in ML |
+| 15 | [Optimization](15_optimization.ipynb) | Intermediate → Advanced | Semester 5–7 (Operations Research, Optimization Techniques, or ML electives) | Linear programming; Convexity; Unconstrained optimality; Constrained optimization: Lagrange and KKT; Gradient descent and its convergence; Second-order and quasi-Newton methods; Stochastic gradient methods; Learning-rate schedules and training tricks; Derivative-free and global optimization; Min-max, games and bilevel problems; Dynamic programming; Optimal transport |
+| 16 | [Matrix Calculus and Automatic Differentiation](16_matrix_calculus_and_autodiff.ipynb) | Advanced (bridge from engineering maths to deep learning) | not usually taught as a course; learned alongside ML in Semester 5–8 | Layout conventions; Vector derivatives; Matrix derivatives; Differentials (the easiest way to derive gradients); Gradients of common ML building blocks; Automatic differentiation; Gradient estimators for stochastic objectives |
+
+## Stage 4 · Machine learning and deep learning
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 17 | [Classical Machine Learning](17_classical_machine_learning.ipynb) | Advanced | Semester 5–7 (Machine Learning, Pattern Recognition, Data Mining) | Learning setup; Linear regression; Logistic and softmax regression; Perceptron; Support vector machines; Kernel and Gaussian-process methods; Probabilistic classifiers; Nearest neighbours and distances; Decision trees; Ensembles; Clustering; Dimensionality reduction; Hidden Markov models; Graphical models and approximate inference; Recommender systems and association rules; Evaluation metrics; Statistical learning theory (short form; more in 25) |
+| 18 | [Deep Learning Foundations](18_deep_learning_foundations.ipynb) | Advanced | Semester 6–8 (Deep Learning, Neural Networks, Computer Vision) | Neuron and multilayer perceptron; Activation functions; Loss functions; Backpropagation; Initialization; Normalization layers; Regularization; Convolutional networks; Object detection and segmentation; Recurrent networks; Autoencoders and embeddings; Training at scale: practical formulas |
+
+## Stage 5 · Modern AI (2017 → present)
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 19 | [Transformers and Large Language Models](19_transformers_and_llms.ipynb) | Modern (2017 → present) | Semester 7–8 electives (NLP, Generative AI) and self-study | Scaled dot-product attention; Multi-head attention and its variants; The transformer block; Positional information; Language-model objectives; Tokenization; Compute, memory and inference; FlashAttention (online softmax); Efficient attention variants; Mixture of experts; Scaling laws; Decoding; Parameter-efficient fine-tuning; Quantization and compression of LLMs; Retrieval-augmented generation; In-context learning (theory notes) |
+| 20 | [Generative Models](20_generative_models.ipynb) | Modern (2013 → present) | Semester 7–8 electives and research | The goal; Autoregressive models; Variational autoencoder (VAE); Generative adversarial networks; Normalizing flows; Energy-based models; Score matching; Denoising diffusion probabilistic models (DDPM); DDIM and fast samplers; Score SDE view; Guidance; Flow matching and rectified flow; Consistency models and distillation; Discrete and masked diffusion for text and tokens |
+| 21 | [Reinforcement Learning](21_reinforcement_learning.ipynb) | Advanced → Modern | Semester 7–8 electives (Reinforcement Learning) and research | Markov decision process; Bellman equations; Dynamic programming; Bandits; Monte Carlo and temporal-difference learning; Deep Q-networks; Policy gradient; Trust-region methods: TRPO and PPO; Deterministic and maximum-entropy actor-critic; Model-based RL and planning; Offline RL, imitation and inverse RL; Exploration, multi-agent and hierarchy; RL for language models (bridge to 22) |
+| 22 | [Alignment, Post-Training and Self-Supervised Learning](22_alignment_and_self_supervised_learning.ipynb) | Modern (2018 → present) | research and self-study | Supervised fine-tuning (SFT); Reward modelling; RLHF with PPO; Direct preference optimization (DPO) and relatives; Group relative policy optimization (GRPO) and RL with verifiable rewards; Constitutional AI / RLAIF; Reward hacking and over-optimization; Contrastive self-supervised learning; Non-contrastive self-supervised learning; Masked and predictive self-supervision; Alignment evaluation and safety |
+| 23 | [Graph and Geometric Deep Learning](23_graph_and_geometric_deep_learning.ipynb) | Modern (2016 → present) | research and electives | Spectral graph convolution; Graph convolutional network (GCN); Message passing neural networks; Known limitations; Graph transformers and positional encodings; Link prediction and knowledge graphs; Spatiotemporal graph networks; Geometric deep learning: symmetry and equivariance; Neural operators (functions to functions) |
+| 24 | [State-Space Models and Modern Sequence Architectures](24_state_space_and_modern_sequence_models.ipynb) | Modern (2020 → present) | research | Continuous-time linear state-space model; Discretization; Convolutional view; HiPPO and S4; Parallel scan; Mamba (selective SSM); Linear attention family as recurrences; RWKV; Long convolutions: Hyena; xLSTM; Continuous-depth and other alternatives; Complexity summary |
+
+## Stage 6 · Research frontier and toward AGI
+
+| # | File | Level | Typical semester | Covers |
+|---|---|---|---|---|
+| 25 | [Learning Theory, Deep Learning Theory and the Mathematics toward AGI](25_learning_theory_and_toward_agi.ipynb) | Research frontier | postgraduate / research | PAC learning; VC dimension; Rademacher complexity; PAC-Bayes; No free lunch, bias-complexity and Occam; Deep learning theory; Scaling and emergence (empirical laws); Algorithmic information theory; Universal intelligence and AIXI; Bayesian brain, predictive coding and active inference; Causality; Meta-learning and continual learning; Open-endedness and quality-diversity; Measuring general intelligence and capability; Alignment theory; Open problems (no settled formulas yet) |
+
+## How the topics depend on each other
+
+```
+01 Algebra & trig ─┬─> 02 Differential calculus ─┬─> 03 Integral calculus ─> 04 Series & Fourier
+                   │                              ├─> 05 ODEs & PDEs ──────────────┐
+                   └─> 06 Linear algebra ─────────┼─> 07 Vector calculus         │
+                                                  │                               v
+          08 Complex analysis ─> 09 Transforms (Laplace, Fourier, Z) <────────────┘
+                                         │
+   10 Numerical methods   11 Probability ─> 12 Statistics      13 Discrete maths & graphs
+                                │
+                                v
+              14 Information theory   15 Optimization   16 Matrix calculus & autodiff
+                                \            |            /
+                                 v           v           v
+                        17 Classical ML ──> 18 Deep learning foundations
+                                                   │
+        ┌──────────────┬──────────────┬────────────┼─────────────┬──────────────┐
+        v              v              v            v             v              v
+  19 Transformers  20 Generative  21 Reinforcement  22 Alignment  23 Graph &   24 State-space
+     & LLMs           models         learning        & SSL        geometric DL    models
+        └──────────────┴──────────────┴────────────┬─┴─────────────┴──────────────┘
+                                                   v
+                              25 Learning theory & toward AGI
+```
+
+## Contributing a formula
+
+Keep the order basic → advanced inside each file, use LaTeX (`$...$` / `$$...$$`), add an
+**ML note** when a formula is used later, and cite a textbook or paper for anything beyond
+the standard syllabus.

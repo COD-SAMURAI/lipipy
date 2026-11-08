@@ -47,14 +47,27 @@ print(model.coef_, model.intercept_, model.score(X, y))
 |---|---|---|
 | `lipipy.core` | base classes, validation, metrics | started |
 | `lipipy.ml` | classic ML in NumPy: linear models, trees, SVM, clustering, PCA, boosting | `LinearRegression` |
+| `lipipy.ai` | classical AI: search, logic, constraint satisfaction, planning, causality | planned |
 | `lipipy.dl` | autograd, layers, attention, CNN/RNN, transformer, optimizers | planned |
 | `lipipy.research` | SSMs/Mamba, mixture-of-experts, diffusion, KANs + benchmark harness | planned |
 | `lipipy.rl` | bandits, DQN, PPO | planned |
-| `lipipy.agents` | LLM agent loops, tool use, reasoning | planned |
+| `lipipy.agents` | LLM agent loops, tool use, reasoning, AGI research directions | planned |
 | `lipipy.interpret` | probing, attribution, mechanistic interpretability | planned |
+
+Each subpackage's `__init__.py` holds the full catalog of algorithms planned for it,
+marked `[x]` when implemented and `[ ]` when planned. Run `help(lipipy.ml)` to see it.
 
 Other top-level folders: `tests/` (parity tests), `notebooks/` (one walkthrough per
 algorithm), `benchmarks/` (reproducible comparisons), `docs/` (MkDocs site).
+
+## Mathematics formula notes
+
+[`notebooks/math/`](notebooks/math/README.md) is a 25-part formula reference that goes in
+order from first-semester engineering mathematics (calculus, linear algebra, differential
+equations, transforms, probability) to the equations behind modern AI (transformers,
+diffusion, RLHF/DPO, state-space models) and learning theory toward AGI. Each file states
+its level, typical semester and prerequisites. Start with
+[`00_index.ipynb`](notebooks/math/00_index.ipynb).
 
 ## Roadmap
 
