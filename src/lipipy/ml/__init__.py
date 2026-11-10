@@ -7,7 +7,7 @@ Supervised learning: regression
 -------------------------------
 [x] Linear regression (ordinary least squares, closed form + gradient descent)
 [ ] Polynomial regression (feature expansion)
-[ ] Ridge regression (L2)
+[x] Ridge regression (L2)
 [ ] Lasso regression (L1, coordinate descent)
 [ ] Elastic net
 [ ] Bayesian linear regression
@@ -19,7 +19,7 @@ Supervised learning: regression
 [ ] Kernel ridge regression
 [ ] Gaussian process regression
 [ ] Support vector regression (SVR)
-[ ] k-nearest neighbours regression
+[x] k-nearest neighbours regression
 [ ] Locally weighted regression (LOESS)
 [ ] Splines and generalized additive models (GAMs)
 
@@ -28,8 +28,10 @@ Supervised learning: classification
 [ ] Perceptron
 [ ] Logistic regression (binary, multinomial / softmax)
 [ ] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
-[ ] Naive Bayes (Gaussian, multinomial, Bernoulli, complement)
-[ ] k-nearest neighbours classifier (brute force, KD-tree, ball tree)
+[x] Naive Bayes: Gaussian
+[ ] Naive Bayes: multinomial, Bernoulli, complement
+[x] k-nearest neighbours classifier (brute force, chunked distances)
+[ ] k-nearest neighbours with KD-tree / ball tree
 [ ] Support vector machines (hard/soft margin, SMO solver)
 [ ] Kernel SVM (linear, polynomial, RBF, sigmoid kernels)
 [ ] Gaussian process classification
@@ -53,7 +55,8 @@ Trees and ensembles
 
 Unsupervised learning: clustering
 ---------------------------------
-[ ] k-means, k-means++, mini-batch k-means
+[x] k-means (Lloyd), k-means++
+[ ] Mini-batch k-means
 [ ] k-medoids (PAM)
 [ ] Hierarchical / agglomerative clustering (single, complete, average, Ward)
 [ ] DBSCAN, HDBSCAN, OPTICS
@@ -67,7 +70,8 @@ Unsupervised learning: clustering
 
 Dimensionality reduction and representation
 -------------------------------------------
-[ ] Principal component analysis (PCA), incremental PCA
+[x] Principal component analysis (PCA)
+[ ] Incremental PCA
 [ ] Kernel PCA
 [ ] Probabilistic PCA, factor analysis
 [ ] Singular value decomposition (truncated SVD / LSA)
@@ -131,8 +135,9 @@ Model selection, evaluation and preprocessing
 ---------------------------------------------
 [ ] Train/test split, k-fold, stratified, time-series cross-validation
 [ ] Grid search, random search, Bayesian optimization (TPE, GP-based)
-[ ] Metrics: accuracy, precision, recall, F1, ROC-AUC, PR-AUC, log loss,
-    MSE, MAE, R^2, silhouette, adjusted Rand index, NMI
+[x] Metrics: accuracy, R^2 (lipipy.core); confusion matrix, precision, recall, F1,
+    MSE, MAE, adjusted Rand index
+[ ] Metrics: ROC-AUC, PR-AUC, log loss, silhouette, NMI
 [ ] Calibration (Platt scaling, isotonic)
 [ ] Scalers (standard, min-max, robust), one-hot and target encoding
 [ ] Imputation (mean, kNN, iterative)
@@ -142,6 +147,35 @@ Model selection, evaluation and preprocessing
     (see lipipy.interpret)
 """
 
-from lipipy.ml.linear import LinearRegression
+from lipipy.ml._base import ClassifierMixin, TransformerMixin
+from lipipy.ml.cluster import KMeans
+from lipipy.ml.decomposition import PCA
+from lipipy.ml.linear import LinearRegression, Ridge
+from lipipy.ml.metrics import (
+    PrecisionRecallF1,
+    adjusted_rand_score,
+    confusion_matrix,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_recall_f1,
+)
+from lipipy.ml.naive_bayes import GaussianNB
+from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
 
-__all__ = ["LinearRegression"]
+__all__ = [
+    "PCA",
+    "ClassifierMixin",
+    "GaussianNB",
+    "KMeans",
+    "KNeighborsClassifier",
+    "KNeighborsRegressor",
+    "LinearRegression",
+    "PrecisionRecallF1",
+    "Ridge",
+    "TransformerMixin",
+    "adjusted_rand_score",
+    "confusion_matrix",
+    "mean_absolute_error",
+    "mean_squared_error",
+    "precision_recall_f1",
+]
