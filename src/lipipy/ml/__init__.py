@@ -143,6 +143,7 @@ Model selection, evaluation and preprocessing
 """
 
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
+from lipipy.ml.cluster import KMeans
 from lipipy.ml.linear import LinearRegression, Ridge
 from lipipy.ml.metrics import (
     PrecisionRecallF1,
@@ -156,6 +157,7 @@ from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
 
 __all__ = [
     "ClassifierMixin",
+    "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
     "LinearRegression",
