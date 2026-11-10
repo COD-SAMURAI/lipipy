@@ -70,6 +70,9 @@ jobs:
         with:
           persist-credentials: false
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        # Non-blocking until "Dependency graph" is enabled in the repository's
+        # Settings → Code security. Remove this line once it is on.
+        continue-on-error: true
         with:
           fail-on-severity: moderate
           deny-licenses: GPL-2.0-only, GPL-3.0-only, AGPL-3.0-only, SSPL-1.0
