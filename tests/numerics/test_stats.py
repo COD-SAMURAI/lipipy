@@ -74,6 +74,36 @@ def test_to_dict_and_repr():
     assert "count=2" in repr(rm)
 
 
+def test_rejected_multi_chunk_batch_leaves_state_unchanged(rng):
+    rm = RunningMoments()
+    rm.update(np.array([1.0, 2.0, 4.0]))
+    before = (rm.count, rm.mean, rm.variance())
+    bad = rng.normal(size=5000)  # spans two 4096-row chunks; NaN is in the second
+    bad[4500] = np.nan
+    with pytest.raises(ValueError, match="NaN"):
+        rm.update(bad)
+    assert (rm.count, rm.mean, rm.variance()) == before
+    X = np.ones((5000, 2))
+    X[4999, 1] = np.inf
+    rm2 = RunningMoments()
+    rm2.update([[1.0, 2.0], [3.0, 5.0]])
+    with pytest.raises(ValueError, match="NaN"):
+        rm2.update(X)
+    assert rm2.count == 2
+    np.testing.assert_array_equal(rm2.mean, [2.0, 3.5])
+
+
+def test_rejected_first_batch_leaves_object_pristine():
+    rm = RunningMoments()
+    with pytest.raises(ValueError, match="NaN"):
+        rm.update([[1.0, 2.0], [np.nan, 3.0]])
+    assert rm.count == 0
+    assert rm.to_dict() == {"count": 0, "mean": None, "variance": None}
+    rm.update([1.0, 2.0, 3.0])  # a different feature shape is still accepted
+    assert rm.mean.shape == ()
+    assert float(rm.mean) == 2.0
+
+
 def test_running_moments_errors():
     rm = RunningMoments()
     with pytest.raises(ValueError, match="no observations"):

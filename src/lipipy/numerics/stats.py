@@ -132,6 +132,9 @@ class RunningMoments:
     def update(self, batch: ArrayLike) -> None:
         """Add observations (scalar, 1-D of scalars, or 2-D ``(n, d)``).
 
+        The update is atomic: the whole batch is validated before any state
+        changes, so a rejected batch leaves the summary exactly as it was.
+
         Raises
         ------
         ValueError
@@ -143,21 +146,21 @@ class RunningMoments:
             raise ValueError(f"batch must be 0-, 1- or 2-dimensional, got {x.ndim}D")
         rows = x.reshape(1) if x.ndim == 0 else x
         shape = rows.shape[1:]
+        if self._shape is not None and shape != self._shape:
+            raise ValueError(f"batch has feature shape {shape}, expected {self._shape}")
+        # Validate the whole batch before touching any state (chunked: O(chunk * d) memory).
+        for start in range(0, rows.shape[0], _CHUNK):
+            if not np.all(np.isfinite(rows[start : start + _CHUNK])):
+                raise ValueError("batch contains NaN or infinity")
         if rows.shape[0] == 0:
             return
         if self._shape is None:
-            if not np.all(np.isfinite(rows[0])):
-                raise ValueError("batch contains NaN or infinity")
             self._shape = shape
             self._shift = rows[0].copy()
             self._mean = np.zeros(shape)
             self._m2 = np.zeros(shape)
-        elif shape != self._shape:
-            raise ValueError(f"batch has feature shape {shape}, expected {self._shape}")
         for start in range(0, rows.shape[0], _CHUNK):
             chunk = rows[start : start + _CHUNK]
-            if not np.all(np.isfinite(chunk)):
-                raise ValueError("batch contains NaN or infinity")
             shifted = chunk - self._shift
             mean_b = shifted.mean(axis=0)
             shifted -= mean_b
