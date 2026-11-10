@@ -86,6 +86,30 @@ def test_register_rejects_duplicates_and_bad_metadata():
         register(domain="test", complexity="O(n)")
 
 
+def test_plugins_can_be_disabled(monkeypatch):
+    import sys
+
+    # `lipipy.core.registry` is the Registry instance; the module lives in sys.modules
+    registry_module = sys.modules["lipipy.core.registry"]
+
+    loaded = []
+
+    class FakeEntryPoint:
+        def load(self):
+            loaded.append(True)
+
+    monkeypatch.setattr(registry_module, "entry_points", lambda group: [FakeEntryPoint()])
+    fresh = registry_module.Registry()
+    monkeypatch.setenv("LIPIPY_DISABLE_PLUGINS", "1")
+    fresh.discover()
+    assert loaded == []
+
+    fresh = registry_module.Registry()
+    monkeypatch.delenv("LIPIPY_DISABLE_PLUGINS")
+    fresh.discover()
+    assert loaded == [True]
+
+
 def test_unknown_name_raises_registry_error():
     with pytest.raises(RegistryError, match="No algorithm named"):
         registry.get("ml.DoesNotExist")

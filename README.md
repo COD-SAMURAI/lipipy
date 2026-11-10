@@ -101,6 +101,13 @@ its level, typical semester and prerequisites. Start with
 - **v0.3**: first research architectures and a shared training/benchmark harness.
 - **Later**: RL, agents and interpretability tracks.
 
+## Dependencies and security
+
+The only required dependency is NumPy. Everything else is an optional extra or used only
+in tests; see [docs/dependencies.md](docs/dependencies.md) for the full list, licences and
+what lipipy builds from scratch. Security policy and reporting: [SECURITY.md](SECURITY.md).
+Run `make security` for the same checks CI runs.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). It includes the checklist every new algorithm

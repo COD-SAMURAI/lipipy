@@ -19,5 +19,6 @@ plugins:
           paths: [src]
 nav:
   - Home: index.md
+  - Dependencies: dependencies.md
   - Algorithms:
       - Linear Regression: algorithms/linear_regression.md

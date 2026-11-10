@@ -7,7 +7,7 @@ Adding a new subpackage requires adding it to LAYERS (and to lipipy.SUBPACKAGES)
 from __future__ import annotations
 
 import ast
-import subprocess
+import subprocess  # nosec B404 - runs our own interpreter on a fixed script
 import sys
 from pathlib import Path
 
@@ -110,7 +110,9 @@ def test_import_lipipy_is_light():
         f"heavy = [m for m in {HEAVY_DEPENDENCIES!r} if m in sys.modules];"
         "print(subs, heavy)"
     )
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True)
+    out = subprocess.run(  # nosec B603 - fixed argv, no shell
+        [sys.executable, "-c", code], capture_output=True, text=True, check=True
+    )
     assert out.stdout.strip() == "[] []", out.stdout
 
 

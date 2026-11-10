@@ -1,7 +1,7 @@
 VENV ?= .venv
 PY := $(VENV)/bin/python
 
-.PHONY: dev dev-all test lint format check complexity notebooks docs clean
+.PHONY: dev dev-all test lint format check complexity security deps-report notebooks docs clean
 
 $(PY):
 	python3 -m venv $(VENV)
@@ -28,6 +28,16 @@ check: lint test  ## everything CI runs
 
 complexity:  ## timing-based complexity checks (machine dependent)
 	$(PY) -m pytest -m complexity
+
+security:  ## dependency audit, static analysis, secret scan, licence policy (same as CI)
+	$(PY) -m pip install -q -e ".[security]"
+	$(VENV)/bin/pip-audit --skip-editable
+	$(VENV)/bin/bandit -q -r src
+	$(PY) scripts/secret_scan.py
+	$(VENV)/bin/pip-licenses --partial-match --fail-on "GPL;SSPL;Proprietary"
+
+deps-report:  ## latest versions and licences of every package in docs/dependencies.md
+	$(PY) scripts/dependency_report.py
 
 notebooks:  ## execute every notebook to make sure it runs
 	$(PY) -m jupyter nbconvert --to notebook --execute --output-dir /tmp/lipipy-nb notebooks/*/*.ipynb
