@@ -6,8 +6,10 @@ registry. ``[x]`` = implemented, ``[ ]`` = planned.
 
 Linear algebra
 --------------
-[ ] Gaussian elimination with partial pivoting, LU, Cholesky, QR (Householder, Givens)
-[ ] Least squares (normal equations, QR, SVD), pseudo-inverse
+[x] Triangular solves, LU with partial pivoting, determinant, Cholesky, Householder QR
+[ ] Givens QR
+[x] Least squares via Householder QR
+[ ] Least squares (normal equations, SVD), pseudo-inverse
 [ ] Eigenvalues: power iteration, inverse iteration, QR algorithm, Lanczos, Arnoldi
 [ ] SVD (one-sided Jacobi, randomized SVD)
 [ ] Iterative solvers: Jacobi, Gauss-Seidel, SOR, conjugate gradient, GMRES
@@ -16,8 +18,10 @@ Linear algebra
 
 Roots and optimization
 ----------------------
-[ ] Bisection, regula falsi, secant, Newton-Raphson, Brent
-[ ] Line search (Armijo, Wolfe), gradient descent, Newton, BFGS, L-BFGS
+[x] Secant, Newton-Raphson, Brent
+[ ] Bisection, regula falsi
+[x] Armijo line search, gradient descent, Newton, BFGS, L-BFGS
+[ ] Wolfe line search
 [ ] Conjugate gradient (nonlinear), trust region, Levenberg-Marquardt
 [ ] Constrained: projected gradient, penalty / augmented Lagrangian, SQP
 [ ] Linear programming (simplex, interior point), quadratic programming
@@ -39,9 +43,12 @@ Transforms and signals
 
 Statistics and probability
 --------------------------
-[ ] Streaming moments (Welford), quantiles, histograms, kernel density estimation
+[x] Streaming moments (Welford / Chan merge), covariance, correlation
+[ ] Quantiles, histograms, kernel density estimation
+[x] Standard normal cdf / ppf
 [ ] Distributions: pdf / cdf / sampling for the common families
-[ ] Special functions: gamma, beta, erf, log-sum-exp, softmax (numerically stable)
+[x] Special functions: erf, erfc, log-sum-exp, softmax, log-softmax, sigmoid, softplus
+[ ] Special functions: gamma, beta
 [ ] Random number generation helpers, quasi-random sequences (Sobol, Halton)
 
 Automatic differentiation
@@ -49,3 +56,75 @@ Automatic differentiation
 [ ] Forward mode (dual numbers)
 [ ] Reverse mode (tape-based scalar and tensor autograd), gradient checking
 """
+
+from lipipy.numerics.linalg import (
+    cholesky,
+    cholesky_solve,
+    det,
+    lstsq_qr,
+    lu,
+    lu_solve,
+    qr,
+    solve_triangular,
+)
+from lipipy.numerics.optimize import (
+    LineSearchResult,
+    OptimizeResult,
+    RootResult,
+    brentq,
+    line_search_armijo,
+    minimize,
+    minimize_bfgs,
+    minimize_gd,
+    minimize_lbfgs,
+    minimize_newton,
+    newton,
+)
+from lipipy.numerics.special import (
+    erf,
+    erfc,
+    log_sigmoid,
+    log_softmax,
+    logsumexp,
+    norm_cdf,
+    norm_ppf,
+    sigmoid,
+    softmax,
+    softplus,
+)
+from lipipy.numerics.stats import RunningMoments, correlation, covariance
+
+__all__ = [
+    "LineSearchResult",
+    "OptimizeResult",
+    "RootResult",
+    "RunningMoments",
+    "brentq",
+    "cholesky",
+    "cholesky_solve",
+    "correlation",
+    "covariance",
+    "det",
+    "erf",
+    "erfc",
+    "line_search_armijo",
+    "log_sigmoid",
+    "log_softmax",
+    "logsumexp",
+    "lstsq_qr",
+    "lu",
+    "lu_solve",
+    "minimize",
+    "minimize_bfgs",
+    "minimize_gd",
+    "minimize_lbfgs",
+    "minimize_newton",
+    "newton",
+    "norm_cdf",
+    "norm_ppf",
+    "qr",
+    "sigmoid",
+    "softmax",
+    "softplus",
+    "solve_triangular",
+]
