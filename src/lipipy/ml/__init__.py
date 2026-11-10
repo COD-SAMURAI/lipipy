@@ -154,11 +154,13 @@ from lipipy.ml.metrics import (
     mean_squared_error,
     precision_recall_f1,
 )
+from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
 
 __all__ = [
     "PCA",
     "ClassifierMixin",
+    "GaussianNB",
     "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
