@@ -58,8 +58,10 @@ def test_time_exponents():
     sizes = (2 * 10**5, 4 * 10**5, 8 * 10**5, 16 * 10**5)
     sort = estimate_complexity(np.sort, vec, sizes=sizes)
     assert sort.time_exponent == pytest.approx(1.05, abs=0.35)
-    quad = estimate_complexity(lambda x: np.outer(x, x), vec, sizes=(500, 1000, 2000, 4000))
-    assert quad.time_exponent == pytest.approx(2.0, abs=0.45)
+    # Direct convolution is compute-bound O(n^2) with O(n) memory, so its timing is
+    # stable. (np.outer at these sizes is memory-bandwidth bound and under-reads, ~1.6.)
+    quad = estimate_complexity(lambda x: np.convolve(x, x), vec, sizes=(2000, 4000, 8000, 16000))
+    assert quad.time_exponent == pytest.approx(2.0, abs=0.25)
 
 
 @pytest.mark.complexity
