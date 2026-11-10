@@ -162,9 +162,11 @@ def test_norm_ppf_matches_ndtri():
 @pytest.mark.filterwarnings("error")
 def test_norm_ppf_subnormal_p():
     sp = pytest.importorskip("scipy.special")
-    p = np.array([5e-324, 1e-320, 1e-310, 2.2e-308, np.finfo(np.float64).tiny])
+    tiny = np.finfo(np.float64).tiny
+    p = np.concatenate([np.geomspace(5e-324, 2.2e-308, 2_000), [1e-320, 1e-310, tiny]])
+    p = np.unique(p)  # subnormal rounding makes some grid points coincide
     got = norm_ppf(p)
-    assert max_rel_err(got, sp.ndtri(p)) <= 1e-8
+    assert max_rel_err(got, sp.ndtri(p)) <= 2e-9  # bound stated in the docstring
     # The symmetric upper tail cannot be subnormal (1 - p >= 2^-53), check it anyway.
     q = 1.0 - np.array([2.0**-53, 1e-16, 1e-15])
     assert max_rel_err(norm_ppf(q), sp.ndtri(q)) <= 1e-12

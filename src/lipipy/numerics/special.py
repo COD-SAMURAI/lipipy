@@ -641,7 +641,9 @@ def norm_ppf(p: ArrayLike) -> np.ndarray:
     For subnormal :math:`p < 2.2\times10^{-308}` (``np.finfo(float).tiny``) the
     Halley step is skipped: its residual would be computed from numbers with few
     significant bits and :math:`e^{x^2/2}` overflows, so there the result is Acklam's
-    approximation alone, with relative error :math:`\le 1.2\times10^{-9}`.
+    approximation alone, with relative error :math:`\le 2\times10^{-9}` (measured
+    max :math:`1.8\times10^{-9}` at :math:`p = 5\times10^{-324}`; Acklam's published
+    :math:`1.15\times10^{-9}` does not hold this far into the tail).
 
     Parameters
     ----------
