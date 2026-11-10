@@ -143,7 +143,7 @@ Model selection, evaluation and preprocessing
 """
 
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
-from lipipy.ml.linear import LinearRegression
+from lipipy.ml.linear import LinearRegression, Ridge
 from lipipy.ml.metrics import (
     PrecisionRecallF1,
     adjusted_rand_score,
@@ -157,6 +157,7 @@ __all__ = [
     "ClassifierMixin",
     "LinearRegression",
     "PrecisionRecallF1",
+    "Ridge",
     "TransformerMixin",
     "adjusted_rand_score",
     "confusion_matrix",
