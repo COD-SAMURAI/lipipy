@@ -14,9 +14,7 @@ import inspect
 
 import numpy as np
 
-
-class NotFittedError(RuntimeError):
-    """Raised when an estimator is used before ``fit`` has been called."""
+from lipipy.core.errors import NotFittedError
 
 
 class BaseEstimator:

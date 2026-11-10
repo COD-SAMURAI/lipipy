@@ -1,7 +1,7 @@
 VENV ?= .venv
 PY := $(VENV)/bin/python
 
-.PHONY: dev dev-all test lint format check notebooks docs clean
+.PHONY: dev dev-all test lint format check complexity notebooks docs clean
 
 $(PY):
 	python3 -m venv $(VENV)
@@ -25,6 +25,9 @@ format:
 	$(PY) -m ruff format .
 
 check: lint test  ## everything CI runs
+
+complexity:  ## timing-based complexity checks (machine dependent)
+	$(PY) -m pytest -m complexity
 
 notebooks:  ## execute every notebook to make sure it runs
 	$(PY) -m jupyter nbconvert --to notebook --execute --output-dir /tmp/lipipy-nb notebooks/*/*.ipynb

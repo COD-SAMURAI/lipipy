@@ -9,6 +9,7 @@ Apache License 2.0 (see LICENSE). lipipy values **correctness and readability ov
 git clone https://github.com/COD-SAMURAI/lipipy && cd lipipy
 make dev        # creates .venv and installs lipipy[dev]
 make check      # lint + format check + tests (same as CI)
+make complexity # timing-based complexity checks (machine dependent)
 ```
 
 ## Definition of done for a new algorithm
@@ -16,7 +17,10 @@ make check      # lint + format check + tests (same as CI)
 A pull request that adds an algorithm should include all of the following.
 Use `src/lipipy/ml/linear/linear_regression.py` as the template.
 
-- [ ] **Implementation** in the right subpackage, using only NumPy for `ml/` (PyTorch is allowed in `dl/` and `research/`).
+- [ ] **Implementation** in the right subpackage, importing only from lower layers (see [ARCHITECTURE.md](ARCHITECTURE.md) §3; `tests/test_architecture.py` enforces it). NumPy only below `dl/`; heavy dependencies go through `lipipy.core.require(...)`.
+- [ ] **Registered** with `@register(...)`, including `Complexity(time=..., space=...)` in the shared variable names, references, supported backends and status.
+- [ ] **Complexity section** in the docstring, and a `bench.estimate_complexity` test if the algorithm is performance-sensitive (mark timing checks with `@pytest.mark.complexity`).
+- [ ] **Randomness** only through a `random_state` parameter and `lipipy.core.check_random_state`.
 - [ ] **Docstring with the math**: the model, the objective, how it is solved, and a reference (textbook or paper).
 - [ ] **scikit-learn style API**: hyperparameters in `__init__`, `fit` returns `self`, learned attributes end in `_`.
 - [ ] **Parity test** against a reference implementation (scikit-learn / PyTorch / the paper's code) in `tests/`.
