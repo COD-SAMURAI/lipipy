@@ -159,6 +159,18 @@ def test_norm_ppf_matches_ndtri():
     assert max_rel_err(norm_ppf(p), sp.ndtri(p)) <= 1e-12
 
 
+@pytest.mark.filterwarnings("error")
+def test_norm_ppf_subnormal_p():
+    sp = pytest.importorskip("scipy.special")
+    p = np.array([5e-324, 1e-320, 1e-310, 2.2e-308, np.finfo(np.float64).tiny])
+    got = norm_ppf(p)
+    assert max_rel_err(got, sp.ndtri(p)) <= 1e-8
+    # The symmetric upper tail cannot be subnormal (1 - p >= 2^-53), check it anyway.
+    q = 1.0 - np.array([2.0**-53, 1e-16, 1e-15])
+    assert max_rel_err(norm_ppf(q), sp.ndtri(q)) <= 1e-12
+    assert np.all(np.diff(got) > 0)  # still monotone across the subnormal boundary
+
+
 def test_norm_ppf_special_values_and_roundtrip():
     np.testing.assert_array_equal(norm_ppf([0.0, 1.0]), [-np.inf, np.inf])
     assert np.all(np.isnan(norm_ppf([-0.1, 1.1, np.nan, -np.inf])))

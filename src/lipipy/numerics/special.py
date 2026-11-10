@@ -35,7 +35,7 @@ of :math:`y = |x|`:
 * :math:`y \le 0.46875`: :math:`\operatorname{erf}(x) \approx x\,R_1(x^2)`;
 * :math:`0.46875 < y \le 4`: :math:`\operatorname{erfc}(y) \approx e^{-y^2} R_2(y)`;
 * :math:`y > 4`: :math:`\operatorname{erfc}(y) \approx \frac{e^{-y^2}}{y}
-  \left(\frac{1}{\sqrt\pi} + y^{-2} R_3(y^{-2})\right)`.
+  \left(\frac{1}{\sqrt\pi} - y^{-2} R_3(y^{-2})\right)`.
 
 The factor :math:`e^{-y^2}` is computed as :math:`e^{-s^2} e^{-(y-s)(y+s)}` with
 :math:`s = \lfloor 16y \rfloor/16`, so :math:`s^2` is exact and no accuracy is lost
@@ -567,6 +567,7 @@ _AC = (-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e00,
 _AD = (7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00,
        3.754408661907416e00)  # fmt: skip
 _P_LOW = 0.02425
+_TINY = float(np.finfo(np.float64).tiny)  # smallest normal double, ~2.2e-308
 
 
 def _polyval(coefs: tuple[float, ...], t: np.ndarray) -> np.ndarray:
@@ -637,6 +638,10 @@ def norm_ppf(p: ArrayLike) -> np.ndarray:
 
     Acklam's rational approximation refined by one Halley step (module docstring).
     Relative error :math:`\lesssim 10^{-15}` for :math:`p\in[10^{-300}, 1-10^{-16}]`.
+    For subnormal :math:`p < 2.2\times10^{-308}` (``np.finfo(float).tiny``) the
+    Halley step is skipped: its residual would be computed from numbers with few
+    significant bits and :math:`e^{x^2/2}` overflows, so there the result is Acklam's
+    approximation alone, with relative error :math:`\le 1.2\times10^{-9}`.
 
     Parameters
     ----------
@@ -669,7 +674,7 @@ def norm_ppf(p: ArrayLike) -> np.ndarray:
     out[p == 0.0] = -np.inf
     out[p == 1.0] = np.inf
 
-    low = (p > 0.0) & (p < _P_LOW)
+    low = (p >= _TINY) & (p < _P_LOW)
     central = (p >= _P_LOW) & (p <= 1.0 - _P_LOW)
     high = (p > 1.0 - _P_LOW) & (p < 1.0)
 
@@ -682,6 +687,11 @@ def norm_ppf(p: ArrayLike) -> np.ndarray:
     # Lower tail: f(x) = Phi(x) - p.
     x = _acklam_tail(p[low])
     out[low] = _halley(x, 0.5 * np.asarray(erfc(-x / _SQRT2)) - p[low])
+
+    # Subnormal p: Acklam only (see docstring). The upper tail never gets here,
+    # since 1 - p >= 2^-53 for any double p < 1.
+    sub = (p > 0.0) & (p < _TINY)
+    out[sub] = _acklam_tail(p[sub])
 
     # Upper tail by symmetry with s = 1 - p (exact for p > 1/2):
     # f(x) = Phi(x) - p = s - Q(x),  Q(x) = erfc(x/sqrt2)/2.
