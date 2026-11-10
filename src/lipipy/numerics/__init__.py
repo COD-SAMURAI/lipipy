@@ -18,8 +18,10 @@ Linear algebra
 
 Roots and optimization
 ----------------------
-[ ] Bisection, regula falsi, secant, Newton-Raphson, Brent
-[ ] Line search (Armijo, Wolfe), gradient descent, Newton, BFGS, L-BFGS
+[x] Secant, Newton-Raphson, Brent
+[ ] Bisection, regula falsi
+[x] Armijo line search, gradient descent, Newton, BFGS, L-BFGS
+[ ] Wolfe line search
 [ ] Conjugate gradient (nonlinear), trust region, Levenberg-Marquardt
 [ ] Constrained: projected gradient, penalty / augmented Lagrangian, SQP
 [ ] Linear programming (simplex, interior point), quadratic programming
@@ -65,6 +67,19 @@ from lipipy.numerics.linalg import (
     qr,
     solve_triangular,
 )
+from lipipy.numerics.optimize import (
+    LineSearchResult,
+    OptimizeResult,
+    RootResult,
+    brentq,
+    line_search_armijo,
+    minimize,
+    minimize_bfgs,
+    minimize_gd,
+    minimize_lbfgs,
+    minimize_newton,
+    newton,
+)
 from lipipy.numerics.special import (
     erf,
     erfc,
@@ -80,7 +95,11 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "LineSearchResult",
+    "OptimizeResult",
+    "RootResult",
     "RunningMoments",
+    "brentq",
     "cholesky",
     "cholesky_solve",
     "correlation",
@@ -88,12 +107,19 @@ __all__ = [
     "det",
     "erf",
     "erfc",
+    "line_search_armijo",
     "log_sigmoid",
     "log_softmax",
     "logsumexp",
     "lstsq_qr",
     "lu",
     "lu_solve",
+    "minimize",
+    "minimize_bfgs",
+    "minimize_gd",
+    "minimize_lbfgs",
+    "minimize_newton",
+    "newton",
     "norm_cdf",
     "norm_ppf",
     "qr",
