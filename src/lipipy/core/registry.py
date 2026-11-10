@@ -24,13 +24,15 @@ Then query it::
 Cost: ``get`` is O(1); ``find`` and ``to_json`` are O(R) for R registered entries.
 The first ``find``/``get``/iteration imports every subpackage once (and the
 ``lipipy.plugins`` entry points) so all algorithms are visible; subpackages whose
-optional dependencies are missing are skipped.
+optional dependencies are missing are skipped. Set the environment variable
+``LIPIPY_DISABLE_PLUGINS=1`` to skip third-party plugins.
 """
 
 from __future__ import annotations
 
 import importlib
 import json
+import os
 import pkgutil
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
@@ -43,6 +45,7 @@ from lipipy.core.errors import MissingDependencyError, RegistryError
 Status = Literal["experimental", "stable", "deprecated"]
 _STATUSES = ("experimental", "stable", "deprecated")
 PLUGIN_GROUP = "lipipy.plugins"
+DISABLE_PLUGINS_ENV = "LIPIPY_DISABLE_PLUGINS"
 
 T = TypeVar("T", bound=Callable[..., Any])
 
@@ -113,6 +116,9 @@ class Registry:
                 importlib.import_module(mod.name)
             except (ImportError, MissingDependencyError):
                 continue  # optional dependency not installed
+        if os.environ.get(DISABLE_PLUGINS_ENV, "").strip().lower() in {"1", "true", "yes"}:
+            return
+        # Plugins are code from packages the user installed; they run on import.
         for ep in entry_points(group=PLUGIN_GROUP):
             try:
                 ep.load()
