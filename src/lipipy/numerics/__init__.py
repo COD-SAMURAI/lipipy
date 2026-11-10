@@ -6,8 +6,10 @@ registry. ``[x]`` = implemented, ``[ ]`` = planned.
 
 Linear algebra
 --------------
-[ ] Gaussian elimination with partial pivoting, LU, Cholesky, QR (Householder, Givens)
-[ ] Least squares (normal equations, QR, SVD), pseudo-inverse
+[x] Triangular solves, LU with partial pivoting, determinant, Cholesky, Householder QR
+[ ] Givens QR
+[x] Least squares via Householder QR
+[ ] Least squares (normal equations, SVD), pseudo-inverse
 [ ] Eigenvalues: power iteration, inverse iteration, QR algorithm, Lanczos, Arnoldi
 [ ] SVD (one-sided Jacobi, randomized SVD)
 [ ] Iterative solvers: Jacobi, Gauss-Seidel, SOR, conjugate gradient, GMRES
@@ -53,6 +55,16 @@ Automatic differentiation
 [ ] Reverse mode (tape-based scalar and tensor autograd), gradient checking
 """
 
+from lipipy.numerics.linalg import (
+    cholesky,
+    cholesky_solve,
+    det,
+    lstsq_qr,
+    lu,
+    lu_solve,
+    qr,
+    solve_triangular,
+)
 from lipipy.numerics.special import (
     erf,
     erfc,
@@ -69,16 +81,24 @@ from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
     "RunningMoments",
+    "cholesky",
+    "cholesky_solve",
     "correlation",
     "covariance",
+    "det",
     "erf",
     "erfc",
     "log_sigmoid",
     "log_softmax",
     "logsumexp",
+    "lstsq_qr",
+    "lu",
+    "lu_solve",
     "norm_cdf",
     "norm_ppf",
+    "qr",
     "sigmoid",
     "softmax",
     "softplus",
+    "solve_triangular",
 ]
