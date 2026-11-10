@@ -36,9 +36,24 @@ from __future__ import annotations
 import numpy as np
 
 from lipipy.core.base import BaseEstimator, RegressorMixin
+from lipipy.core.complexity import Complexity
+from lipipy.core.registry import register
 from lipipy.core.validation import check_array, check_X_y
 
 
+@register(
+    domain="ml",
+    tasks=("regression",),
+    complexity=Complexity(
+        time="O(n d^2 + d^3)",
+        space="O(n d)",
+        notes="solver='gd' costs O(T n d) time; both keep one centred copy of X",
+    ),
+    references=(
+        "Hastie, Tibshirani & Friedman, The Elements of Statistical Learning, 2nd ed., §3.2",
+    ),
+    status="stable",
+)
 class LinearRegression(RegressorMixin, BaseEstimator):
     """Ordinary least squares linear regression.
 
@@ -65,6 +80,11 @@ class LinearRegression(RegressorMixin, BaseEstimator):
         Iterations run (1 for ``"lstsq"``).
     loss_history_ : list of float
         Training MSE per iteration (``"gd"`` only, empty otherwise).
+
+    Complexity
+    ----------
+    ``solver="lstsq"``: time O(n d^2 + d^3), extra space O(n d).
+    ``solver="gd"``: time O(T n d) for T iterations, extra space O(n d).
 
     Examples
     --------
