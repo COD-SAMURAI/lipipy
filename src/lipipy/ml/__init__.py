@@ -142,6 +142,25 @@ Model selection, evaluation and preprocessing
     (see lipipy.interpret)
 """
 
+from lipipy.ml._base import ClassifierMixin, TransformerMixin
 from lipipy.ml.linear import LinearRegression
+from lipipy.ml.metrics import (
+    PrecisionRecallF1,
+    adjusted_rand_score,
+    confusion_matrix,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_recall_f1,
+)
 
-__all__ = ["LinearRegression"]
+__all__ = [
+    "ClassifierMixin",
+    "LinearRegression",
+    "PrecisionRecallF1",
+    "TransformerMixin",
+    "adjusted_rand_score",
+    "confusion_matrix",
+    "mean_absolute_error",
+    "mean_squared_error",
+    "precision_recall_f1",
+]
