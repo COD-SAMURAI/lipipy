@@ -39,7 +39,8 @@ Transforms and signals
 
 Statistics and probability
 --------------------------
-[ ] Streaming moments (Welford), quantiles, histograms, kernel density estimation
+[x] Streaming moments (Welford / Chan merge), covariance, correlation
+[ ] Quantiles, histograms, kernel density estimation
 [x] Standard normal cdf / ppf
 [ ] Distributions: pdf / cdf / sampling for the common families
 [x] Special functions: erf, erfc, log-sum-exp, softmax, log-softmax, sigmoid, softplus
@@ -64,8 +65,12 @@ from lipipy.numerics.special import (
     softmax,
     softplus,
 )
+from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "RunningMoments",
+    "correlation",
+    "covariance",
     "erf",
     "erfc",
     "log_sigmoid",
