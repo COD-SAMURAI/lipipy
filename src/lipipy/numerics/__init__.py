@@ -40,8 +40,10 @@ Transforms and signals
 Statistics and probability
 --------------------------
 [ ] Streaming moments (Welford), quantiles, histograms, kernel density estimation
+[x] Standard normal cdf / ppf
 [ ] Distributions: pdf / cdf / sampling for the common families
-[ ] Special functions: gamma, beta, erf, log-sum-exp, softmax (numerically stable)
+[x] Special functions: erf, erfc, log-sum-exp, softmax, log-softmax, sigmoid, softplus
+[ ] Special functions: gamma, beta
 [ ] Random number generation helpers, quasi-random sequences (Sobol, Halton)
 
 Automatic differentiation
@@ -49,3 +51,29 @@ Automatic differentiation
 [ ] Forward mode (dual numbers)
 [ ] Reverse mode (tape-based scalar and tensor autograd), gradient checking
 """
+
+from lipipy.numerics.special import (
+    erf,
+    erfc,
+    log_sigmoid,
+    log_softmax,
+    logsumexp,
+    norm_cdf,
+    norm_ppf,
+    sigmoid,
+    softmax,
+    softplus,
+)
+
+__all__ = [
+    "erf",
+    "erfc",
+    "log_sigmoid",
+    "log_softmax",
+    "logsumexp",
+    "norm_cdf",
+    "norm_ppf",
+    "sigmoid",
+    "softmax",
+    "softplus",
+]
