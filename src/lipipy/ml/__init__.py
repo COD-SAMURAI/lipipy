@@ -152,9 +152,12 @@ from lipipy.ml.metrics import (
     mean_squared_error,
     precision_recall_f1,
 )
+from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
 
 __all__ = [
     "ClassifierMixin",
+    "KNeighborsClassifier",
+    "KNeighborsRegressor",
     "LinearRegression",
     "PrecisionRecallF1",
     "Ridge",
