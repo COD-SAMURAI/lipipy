@@ -14,6 +14,7 @@ from lipipy.quantum import (
     SX,
     Circuit,
     H,
+    Instruction,
     S,
     T,
     X,
@@ -184,3 +185,16 @@ def test_validation_errors():
     with pytest.raises(ValueError, match=">= 1"):
         Circuit(0)
     assert c.num_gates == 0  # failed calls append nothing
+
+
+def test_instruction_invariant_enforced_at_construction():
+    with pytest.raises(ValueError, match="exactly one"):
+        Instruction("x", (0,))
+    with pytest.raises(ValueError, match="exactly one"):
+        Instruction("x", (0,), diagonal=np.ones(2), _matrix=X)
+    with pytest.raises(ValueError, match=r"expected \(4, 4\)"):
+        Instruction("cx", (0, 1), _matrix=X)
+    with pytest.raises(ValueError, match=r"expected \(2,\)"):
+        Instruction("z", (0,), diagonal=np.ones(4))
+    np.testing.assert_array_equal(Instruction("z", (0,), diagonal=np.array([1, -1])).matrix, Z)
+    np.testing.assert_array_equal(Instruction("x", (0,), _matrix=X).matrix, X)

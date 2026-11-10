@@ -63,6 +63,10 @@ class Instruction:
         Angles of parametrized gates (empty otherwise).
     diagonal : ndarray or None
         For diagonal gates, the diagonal only (applied in O(2^q)); else ``None``.
+
+    Exactly one of ``diagonal`` (shape ``(2**k,)``) and the dense matrix
+    ``_matrix`` (shape ``(2**k, 2**k)``), with ``k = len(qubits)``, must be given;
+    this is checked at construction.
     """
 
     name: str
@@ -71,13 +75,35 @@ class Instruction:
     diagonal: np.ndarray | None = field(default=None, repr=False)
     _matrix: np.ndarray | None = field(default=None, repr=False)
 
+    def __post_init__(self) -> None:
+        if (self.diagonal is None) == (self._matrix is None):
+            raise ValueError(
+                f"Instruction {self.name!r} needs exactly one of a diagonal or a dense matrix"
+            )
+        dim = 2 ** len(self.qubits)
+        if self.diagonal is not None and self.diagonal.shape != (dim,):
+            raise ValueError(
+                f"diagonal of {self.name!r} has shape {self.diagonal.shape}, expected ({dim},) "
+                f"for {len(self.qubits)} qubits"
+            )
+        if self._matrix is not None and self._matrix.shape != (dim, dim):
+            raise ValueError(
+                f"matrix of {self.name!r} has shape {self._matrix.shape}, expected "
+                f"({dim}, {dim}) for {len(self.qubits)} qubits"
+            )
+
     @property
     def matrix(self) -> np.ndarray:
         """Dense gate matrix, shape ``(2**k, 2**k)``."""
-        if self._matrix is not None:
-            return self._matrix
-        assert self.diagonal is not None  # nosec B101 - invariant of the constructor
-        return np.diag(self.diagonal)
+        if self.diagonal is not None:
+            return np.diag(self.diagonal)
+        return self._dense()
+
+    def _dense(self) -> np.ndarray:
+        """The stored dense matrix; ``__post_init__`` guarantees it exists here."""
+        if self._matrix is None:  # pragma: no cover - excluded by __post_init__
+            raise RuntimeError(f"Instruction {self.name!r} has neither diagonal nor matrix")
+        return self._matrix
 
     def inverse(self) -> Instruction:
         """The adjoint gate, with a matching name and parameters."""
@@ -92,8 +118,7 @@ class Instruction:
             params = (-theta, -lam, -phi)
         if self.diagonal is not None:
             return Instruction(name, self.qubits, params, diagonal=self.diagonal.conj())
-        assert self._matrix is not None  # nosec B101
-        return Instruction(name, self.qubits, params, _matrix=self._matrix.conj().T)
+        return Instruction(name, self.qubits, params, _matrix=self._dense().conj().T)
 
     def __str__(self) -> str:
         args = ", ".join(f"{p:.6g}" for p in self.params)
