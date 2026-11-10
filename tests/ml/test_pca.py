@@ -34,22 +34,25 @@ def test_parity_with_sklearn(rng, n_components, whiten, shape):
     ours = PCA(n_components=n_components, whiten=whiten).fit(X)
     ref = SkPCA(n_components=n_components, whiten=whiten, svd_solver="full").fit(X)
     assert ours.n_components_ == ref.n_components_
-    for attr in (
-        "components_",
-        "explained_variance_",
-        "explained_variance_ratio_",
-        "singular_values_",
-        "mean_",
-    ):
+    for attr in ("explained_variance_", "explained_variance_ratio_", "singular_values_", "mean_"):
         np.testing.assert_allclose(
             getattr(ours, attr), getattr(ref, attr), rtol=1e-8, atol=1e-10, err_msg=attr
         )
     assert ours.noise_variance_ == pytest.approx(ref.noise_variance_, rel=1e-8, abs=1e-12)
+    # With n <= d the centred data has rank n - 1: a component with zero variance spans
+    # an arbitrary null-space direction (LAPACK-dependent), so compare only the
+    # well-defined components, i.e. those with non-zero variance.
+    m = min(ours.n_components_, n - 1) if n <= d else ours.n_components_
+    np.testing.assert_allclose(ours.components_[:m], ref.components_[:m], rtol=1e-8, atol=1e-10)
     X_new = make_data(rng, n=10, d=d)
     Z = ours.transform(X_new)
-    np.testing.assert_allclose(Z, ref.transform(X_new), rtol=1e-8, atol=1e-8)
-    np.testing.assert_allclose(ours.inverse_transform(Z), ref.inverse_transform(Z), atol=1e-8)
-    np.testing.assert_allclose(ours.fit_transform(X), ref.fit_transform(X), atol=1e-8)
+    np.testing.assert_allclose(Z[:, :m], ref.transform(X_new)[:, :m], rtol=1e-8, atol=1e-8)
+    np.testing.assert_allclose(ours.fit_transform(X)[:, :m], ref.fit_transform(X)[:, :m], atol=1e-8)
+    if m == ours.n_components_:
+        np.testing.assert_allclose(ours.inverse_transform(Z), ref.inverse_transform(Z), atol=1e-8)
+    else:  # the null component is still orthonormal to the others
+        C = ours.components_
+        np.testing.assert_allclose(C @ C.T, np.eye(len(C)), atol=1e-10)
 
 
 def test_sign_convention_largest_entry_positive(rng):
