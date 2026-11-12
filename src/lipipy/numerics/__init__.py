@@ -30,15 +30,19 @@ Roots and optimization
 Calculus and differential equations
 -----------------------------------
 [ ] Finite differences, Richardson extrapolation
-[ ] Quadrature: trapezoid, Simpson, Romberg, Gauss-Legendre, adaptive, Monte Carlo
-[ ] ODE solvers: Euler, Heun, RK4, adaptive RK45 (Dormand-Prince), implicit Euler, BDF
-[ ] SDE solvers: Euler-Maruyama, Milstein
+[x] Quadrature: trapezoid, Simpson, Gauss-Legendre (Golub-Welsch), adaptive Gauss-Kronrod
+    (G7-K15), Monte Carlo
+[ ] Quadrature: Romberg
+[x] ODE solvers: RK4, adaptive RK45 (Dormand-Prince, dense output), implicit Euler (Newton)
+[ ] ODE solvers: Euler, Heun, BDF
+[x] SDE solvers: Euler-Maruyama, Milstein
 [ ] PDE: finite-difference heat / wave / Laplace (explicit, Crank-Nicolson)
-[ ] Interpolation: Lagrange, Newton divided differences, cubic splines
+[x] Interpolation: piecewise linear, cubic splines (not-a-knot, natural, clamped)
+[ ] Interpolation: Lagrange, Newton divided differences
 
 Transforms and signals
 ----------------------
-[ ] DFT, radix-2 FFT, real FFT, convolution via FFT
+[x] FFT: radix-2 Cooley-Tukey, Bluestein (any length), real FFT, convolution via FFT
 [ ] DCT, wavelet transform (Haar, Daubechies)
 
 Statistics and probability
@@ -109,32 +113,15 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
-    "interp_linear",
     "CubicSpline",
-    "milstein",
-    "euler_maruyama",
-    "SDEResult",
-    "solve_ode",
-    "ODEResult",
-    "trapezoid",
-    "simpson",
-    "quad",
-    "monte_carlo",
-    "gauss_legendre_nodes",
-    "gauss_legendre",
-    "QuadResult",
-    "MonteCarloResult",
-    "rfftfreq",
-    "rfft",
-    "irfft",
-    "ifft",
-    "fftfreq",
-    "fftconvolve",
-    "fft",
     "LineSearchResult",
+    "MonteCarloResult",
+    "ODEResult",
     "OptimizeResult",
+    "QuadResult",
     "RootResult",
     "RunningMoments",
+    "SDEResult",
     "brentq",
     "cholesky",
     "cholesky_solve",
@@ -143,6 +130,15 @@ __all__ = [
     "det",
     "erf",
     "erfc",
+    "euler_maruyama",
+    "fft",
+    "fftconvolve",
+    "fftfreq",
+    "gauss_legendre",
+    "gauss_legendre_nodes",
+    "ifft",
+    "interp_linear",
+    "irfft",
     "line_search_armijo",
     "log_sigmoid",
     "log_softmax",
@@ -150,17 +146,25 @@ __all__ = [
     "lstsq_qr",
     "lu",
     "lu_solve",
+    "milstein",
     "minimize",
     "minimize_bfgs",
     "minimize_gd",
     "minimize_lbfgs",
     "minimize_newton",
+    "monte_carlo",
     "newton",
     "norm_cdf",
     "norm_ppf",
     "qr",
+    "quad",
+    "rfft",
+    "rfftfreq",
     "sigmoid",
+    "simpson",
     "softmax",
     "softplus",
+    "solve_ode",
     "solve_triangular",
+    "trapezoid",
 ]
