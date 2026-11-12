@@ -40,7 +40,8 @@ Supervised learning: classification
 
 Trees and ensembles
 -------------------
-[ ] Decision trees: ID3, C4.5, CART (Gini, entropy, MSE splits; pruning)
+[x] Decision trees: CART (Gini, entropy, MSE splits)
+[ ] Decision trees: ID3, C4.5, cost-complexity pruning
 [ ] Bagging
 [ ] Random forest
 [ ] Extremely randomized trees (Extra-Trees)
@@ -161,10 +162,13 @@ from lipipy.ml.metrics import (
 )
 from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 
 __all__ = [
     "PCA",
     "ClassifierMixin",
+    "DecisionTreeClassifier",
+    "DecisionTreeRegressor",
     "GaussianNB",
     "KMeans",
     "KNeighborsClassifier",
@@ -174,6 +178,7 @@ __all__ = [
     "PrecisionRecallF1",
     "Ridge",
     "TransformerMixin",
+    "Tree",
     "adjusted_rand_score",
     "confusion_matrix",
     "mean_absolute_error",
