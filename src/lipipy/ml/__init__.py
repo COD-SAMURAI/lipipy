@@ -43,10 +43,11 @@ Trees and ensembles
 [x] Decision trees: CART (Gini, entropy, MSE splits)
 [ ] Decision trees: ID3, C4.5, cost-complexity pruning
 [ ] Bagging
-[ ] Random forest
+[x] Random forest
 [ ] Extremely randomized trees (Extra-Trees)
 [ ] AdaBoost (SAMME, SAMME.R)
-[ ] Gradient boosting machines
+[x] Gradient boosting machines (squared error, binary log loss)
+[ ] Gradient boosting: multiclass, Huber / quantile losses
 [ ] XGBoost-style boosting (second-order, regularized)
 [ ] LightGBM-style histogram boosting (GOSS, EFB)
 [ ] CatBoost-style ordered boosting
@@ -151,6 +152,12 @@ Model selection, evaluation and preprocessing
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
 from lipipy.ml.cluster import KMeans
 from lipipy.ml.decomposition import PCA
+from lipipy.ml.ensemble import (
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
+)
 from lipipy.ml.linear import LinearRegression, LogisticRegression, Ridge
 from lipipy.ml.metrics import (
     PrecisionRecallF1,
@@ -170,12 +177,16 @@ __all__ = [
     "DecisionTreeClassifier",
     "DecisionTreeRegressor",
     "GaussianNB",
+    "GradientBoostingClassifier",
+    "GradientBoostingRegressor",
     "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
     "LinearRegression",
     "LogisticRegression",
     "PrecisionRecallF1",
+    "RandomForestClassifier",
+    "RandomForestRegressor",
     "Ridge",
     "TransformerMixin",
     "Tree",
