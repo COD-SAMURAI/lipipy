@@ -26,7 +26,7 @@ Supervised learning: regression
 Supervised learning: classification
 -----------------------------------
 [ ] Perceptron
-[ ] Logistic regression (binary, multinomial / softmax)
+[x] Logistic regression (binary, multinomial / softmax)
 [ ] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
 [x] Naive Bayes: Gaussian
 [ ] Naive Bayes: multinomial, Bernoulli, complement
@@ -150,7 +150,7 @@ Model selection, evaluation and preprocessing
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
 from lipipy.ml.cluster import KMeans
 from lipipy.ml.decomposition import PCA
-from lipipy.ml.linear import LinearRegression, Ridge
+from lipipy.ml.linear import LinearRegression, LogisticRegression, Ridge
 from lipipy.ml.metrics import (
     PrecisionRecallF1,
     adjusted_rand_score,
@@ -170,6 +170,7 @@ __all__ = [
     "KNeighborsClassifier",
     "KNeighborsRegressor",
     "LinearRegression",
+    "LogisticRegression",
     "PrecisionRecallF1",
     "Ridge",
     "TransformerMixin",
