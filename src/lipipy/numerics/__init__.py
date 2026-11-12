@@ -68,6 +68,7 @@ from lipipy.numerics.integrate import (
     simpson,
     trapezoid,
 )
+from lipipy.numerics.interpolate import CubicSpline, interp_linear
 from lipipy.numerics.linalg import (
     cholesky,
     cholesky_solve,
@@ -108,6 +109,8 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "interp_linear",
+    "CubicSpline",
     "milstein",
     "euler_maruyama",
     "SDEResult",
