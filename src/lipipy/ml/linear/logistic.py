@@ -46,6 +46,23 @@ With :math:`r_i = \sigma(z_i) - y_i` (binomial) or
 The objective is strictly convex in :math:`W` and is minimised with
 :func:`~lipipy.numerics.minimize_lbfgs`, starting from zero.
 
+Newton-CG polish at the floating-point limit
+--------------------------------------------
+L-BFGS accepts a step only if it decreases :math:`f` (Armijo). Near the optimum the
+decrease, about :math:`\lVert g\rVert^2/\lambda`, falls below the rounding error of
+:math:`f \approx O(1)` once :math:`\lVert g\rVert \approx 10^{-8}`, so the line search
+stalls just above a tight ``tol`` (where exactly depends on the platform's BLAS).
+Gradients do not suffer from this cancellation, so we finish with Newton steps
+:math:`H s = -g` solved by conjugate gradients from exact Hessian-vector products
+
+.. math::  H v = \tfrac1n X^\top \bigl(D \odot (X v_W + v_b)\bigr) + \tfrac{1}{Cn} v_W,
+
+with :math:`D_i = p_i(1-p_i)` (binomial) or, per sample, the softmax Jacobian
+:math:`\operatorname{diag}(p_i) - p_i p_i^\top` (multinomial). A Newton step is
+accepted only if it reduces :math:`\lVert g\rVert_\infty`; near the optimum each one
+reduces it quadratically (Nocedal & Wright §7.1). Each product costs O(n d k) time
+and O(n k) memory, like a gradient.
+
 Uniqueness of the multinomial intercepts
 ----------------------------------------
 Adding the same constant to every :math:`b_c` leaves the softmax unchanged and the
@@ -65,6 +82,7 @@ from __future__ import annotations
 
 import numbers
 import warnings
+from functools import partial
 
 import numpy as np
 
@@ -76,6 +94,7 @@ from lipipy.ml._base import ClassifierMixin, check_n_features, check_X_labels
 from lipipy.numerics import log_sigmoid, log_softmax, minimize_lbfgs, sigmoid
 
 _MULTI_CLASS = ("auto", "multinomial")
+_CG_MAX_ITER = 50  # per Newton step; with <= 10 steps the polish is O(n d k) work
 
 
 class _Objective:
@@ -134,11 +153,67 @@ class _Objective:
         self._key, self._value = key, (loss, grad)
         return loss, grad
 
+    def hessp(self, theta: np.ndarray, v: np.ndarray) -> np.ndarray:
+        """Hessian-vector product :math:`H(\theta) v` in O(n d k) time, O(n k) memory."""
+        W, b = self.unpack(theta)
+        VW, vb = self.unpack(v)
+        Z = self.X @ W.T + b
+        U = self.X @ VW.T + vb  # directional derivative of the logits
+        if self.multinomial:
+            P = np.exp(log_softmax(Z, axis=1))
+            HU = P * U
+            HU -= P * HU.sum(axis=1, keepdims=True)  # (diag(p) - p p^T) u, row-wise
+        else:
+            p = sigmoid(Z[:, 0])
+            HU = (p * (1.0 - p))[:, None] * U
+        HW = (HU.T @ self.X) / self.n + self.l2 * VW
+        if self.fit_intercept:
+            return np.concatenate([HW.ravel(), HU.mean(axis=0)])
+        return HW.ravel()
+
     def fun(self, theta: np.ndarray) -> float:
         return self._evaluate(theta)[0]
 
     def jac(self, theta: np.ndarray) -> np.ndarray:
         return self._evaluate(theta)[1]
+
+
+def _conjugate_gradient(hessp, g: np.ndarray, max_iter: int) -> np.ndarray:
+    """Approximately solve ``H s = -g`` for positive semi-definite ``H`` (CG, N&W Alg. 5.2)."""
+    s = np.zeros_like(g)
+    r = -g.copy()  # residual -g - H s
+    p = r.copy()
+    rr = float(r @ r)
+    stop = 1e-12 * rr
+    for _ in range(max_iter):
+        Hp = hessp(p)
+        curvature = float(p @ Hp)
+        if not curvature > 0:  # flat direction (e.g. the multinomial intercept shift)
+            break
+        alpha = rr / curvature
+        s += alpha * p
+        r -= alpha * Hp
+        rr_new = float(r @ r)
+        if rr_new <= stop:
+            break
+        p = r + (rr_new / rr) * p
+        rr = rr_new
+    return s
+
+
+def _newton_polish(obj: _Objective, theta: np.ndarray, tol: float, max_steps: int = 10):
+    """Newton-CG steps from ``theta``, each kept only if it lowers the gradient norm."""
+    g = obj.jac(theta)
+    steps = 0
+    while steps < max_steps and np.max(np.abs(g)) > tol:
+        s = _conjugate_gradient(partial(obj.hessp, theta), g, max_iter=_CG_MAX_ITER)
+        theta_new = theta + s
+        g_new = obj.jac(theta_new)
+        if not np.max(np.abs(g_new)) < np.max(np.abs(g)):
+            break
+        theta, g = theta_new, g_new
+        steps += 1
+    return theta, g, steps
 
 
 @register(
@@ -150,7 +225,9 @@ class _Objective:
         notes=(
             "T L-BFGS iterations, each O(n d k) for the logits and the gradient plus "
             "line-search evaluations of the same cost; k = 1 for the binomial model; "
-            "the L-BFGS memory adds O(m d k) with m = 10"
+            "the L-BFGS memory adds O(m d k) with m = 10; the optional Newton-CG "
+            "polish adds at most 10 x 50 Hessian-vector products, each O(n d k) time "
+            "and O(n k) memory"
         ),
     ),
     references=(
@@ -181,11 +258,10 @@ class LogisticRegression(ClassifierMixin, BaseEstimator):
         Maximum number of L-BFGS iterations.
     tol : float, default=1e-8
         Stop when the infinity norm of the gradient of the scaled objective
-        :math:`f` (module docstring) is at most ``tol``. The solver also stops,
-        as converged, when no step can decrease :math:`f` in floating point any
-        more (the gradient is then at the rounding level of :math:`f`, below
-        ``1e-7`` in our tests; scikit-learn's L-BFGS-B stops the same way through
-        its ``ftol = 64 eps`` rule). The bound is absolute and the gradient scales
+        :math:`f` (module docstring) is at most ``tol``. If L-BFGS stalls at the
+        floating-point resolution of :math:`f` first, Newton-CG steps finish the
+        job (module docstring), so ``tol`` is met unless a warning is issued. The
+        bound is absolute and the gradient scales
         with the features, so very small features need a proportionally smaller
         ``tol``; features many orders of magnitude below one also make the problem
         ill-conditioned (the curvature in W is tiny next to the intercept's), which
@@ -199,7 +275,7 @@ class LogisticRegression(ClassifierMixin, BaseEstimator):
     intercept_ : ndarray of shape (1,) or (k,)
         Zeros when ``fit_intercept=False``; multinomial intercepts sum to zero.
     n_iter_ : int
-        L-BFGS iterations performed.
+        L-BFGS iterations plus accepted Newton-CG polish steps.
     n_features_in_ : int
 
     Raises
@@ -210,14 +286,15 @@ class LogisticRegression(ClassifierMixin, BaseEstimator):
     Warns
     -----
     ConvergenceWarning
-        If neither stopping rule of ``tol`` is met within ``max_iter`` iterations, or
-        the line search fails.
+        If the gradient infinity-norm is still above ``tol`` after ``max_iter``
+        L-BFGS iterations, or after the Newton-CG polish stops making progress.
 
     Complexity
     ----------
     ``fit``: time O(n d k) per L-BFGS iteration (logits ``X W^T`` and the gradient
-    ``R^T X``), extra space O(n k + d k): the logits and residuals, never a copy of
-    ``X`` or an n × n matrix. ``predict*``: time O(n d k), extra space O(n k).
+    ``R^T X``), plus at most 500 Hessian-vector products of the same cost in the
+    Newton-CG polish; extra space O(n k + d k): the logits and residuals, never a
+    copy of ``X`` or an n × n matrix. ``predict*``: time O(n d k), extra space O(n k).
 
     References
     ----------
@@ -290,19 +367,20 @@ class LogisticRegression(ClassifierMixin, BaseEstimator):
                 tol=float(self.tol),
                 maxiter=int(self.max_iter),
             )
-        # minimize_lbfgs also stops when f can no longer decrease in floating point: the
-        # gradient is then at the rounding level of f (~1e-8 for this scaling). Like
-        # scikit-learn's L-BFGS-B stopping rule ftol = 64 eps, we count that as converged.
-        at_rounding_limit = res.message.startswith("no decrease in f")
-        if not (res.success or at_rounding_limit):
+        theta, grad, n_newton = res.x, res.grad, 0
+        if not res.success and res.nit < int(self.max_iter):
+            # The line search stalled at the floating-point resolution of f (module
+            # docstring): finish with gradient-based Newton-CG steps.
+            theta, grad, n_newton = _newton_polish(obj, theta, float(self.tol))
+        if not np.max(np.abs(grad)) <= self.tol:
             warnings.warn(
                 f"LogisticRegression did not converge ({res.message}; gradient "
-                f"infinity-norm {np.max(np.abs(res.grad)):.3g} > tol={self.tol}). "
+                f"infinity-norm {np.max(np.abs(grad)):.3g} > tol={self.tol}). "
                 "Increase max_iter, or scale the features.",
                 ConvergenceWarning,
                 stacklevel=2,
             )
-        W, b = obj.unpack(res.x)
+        W, b = obj.unpack(theta)
         b = b.copy()
         if multinomial and self.fit_intercept:
             b -= b.mean()  # pick the unique representative with sum(b) = 0
@@ -311,7 +389,7 @@ class LogisticRegression(ClassifierMixin, BaseEstimator):
         self.classes_ = classes
         self.coef_ = W.copy()
         self.intercept_ = b
-        self.n_iter_ = int(res.nit)
+        self.n_iter_ = int(res.nit) + n_newton
         self.n_features_in_ = X.shape[1]
         return self
 

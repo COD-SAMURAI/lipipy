@@ -71,7 +71,11 @@ def test_parity_with_sklearn(k, fit_intercept, C):
 @pytest.mark.filterwarnings("error")
 @pytest.mark.parametrize("k", [2, 4])
 def test_converged_gradient_below_documented_bound(k):
-    """Docstring claim: the scaled gradient at the solution is below 1e-7 (default tol)."""
+    """Docstring claim: without a warning, the scaled gradient is <= tol (1e-8).
+
+    L-BFGS alone stalls at the rounding level of f (1e-8 to 1.5e-7, platform
+    dependent); the Newton-CG polish must bring every fit below tol.
+    """
     for seed in range(15):
         rng = np.random.default_rng(seed)
         for scale, shift in [(1.0, 0.0), (3.0, 2.0), (0.2, -1.0)]:
@@ -79,7 +83,36 @@ def test_converged_gradient_below_documented_bound(k):
             for C in (0.01, 1.0, 100.0):
                 for fit_intercept in (True, False):
                     m = LogisticRegression(C=C, fit_intercept=fit_intercept).fit(X, y)
-                    assert np.max(np.abs(scaled_gradient(m, X, y))) < 1e-7
+                    assert np.max(np.abs(scaled_gradient(m, X, y))) <= 1e-8
+
+
+@pytest.mark.parametrize("k, fit_intercept", [(2, True), (2, False), (4, True), (4, False)])
+def test_hessian_vector_product_matches_finite_differences(k, fit_intercept):
+    from lipipy.ml.linear.logistic import _Objective
+
+    rng = np.random.default_rng(k)
+    X, y = make_data(rng, n=80, d=3, k=k)
+    obj = _Objective(X, y, k, k > 2, fit_intercept, 0.7)
+    theta = rng.normal(size=obj.size)
+    for _ in range(3):
+        v = rng.normal(size=obj.size)
+        h = 1e-6
+        fd = (obj.jac(theta + h * v) - obj.jac(theta - h * v)) / (2 * h)
+        np.testing.assert_allclose(obj.hessp(theta, v), fd, rtol=1e-6, atol=1e-8)
+
+
+def test_newton_polish_finishes_a_stalled_lbfgs_run():
+    """Start the polish from a point a few L-BFGS iterations in: it must reach tol."""
+    from lipipy.ml.linear.logistic import _newton_polish, _Objective
+
+    rng = np.random.default_rng(0)
+    X, y = make_data(rng, k=3, scale=3.0, shift=2.0)
+    obj = _Objective(X, y, 3, True, True, 1.0)
+    with pytest.warns(ConvergenceWarning):
+        start = LogisticRegression(max_iter=15).fit(X, y)
+    theta = np.concatenate([start.coef_.ravel(), start.intercept_])
+    theta, g, steps = _newton_polish(obj, theta, 1e-10)
+    assert np.max(np.abs(g)) <= 1e-10 and 1 <= steps <= 10
 
 
 def test_parity_ill_conditioned_features():
@@ -91,9 +124,7 @@ def test_parity_ill_conditioned_features():
         ref = sk_logistic(1.0, True).fit(X, y)
         np.testing.assert_allclose(ours.predict_proba(X), ref.predict_proba(X), atol=1e-5)
         # ours is at least as optimal as the reference
-        assert np.max(np.abs(scaled_gradient(ours, X, y))) <= max(
-            1e-7, np.max(np.abs(scaled_gradient(ref, X, y)))
-        )
+        assert np.max(np.abs(scaled_gradient(ours, X, y))) <= 1e-8
 
 
 def test_multinomial_two_classes_equals_binomial_with_double_C(rng):
@@ -156,14 +187,14 @@ def test_constant_and_duplicate_features(rng):
     m = LogisticRegression().fit(X, y)
     # a duplicated column gets identical weights (strictly convex in W)
     np.testing.assert_allclose(m.coef_[:, 0], m.coef_[:, -1], atol=1e-6)
-    assert np.max(np.abs(scaled_gradient(m, X, y))) < 1e-7
+    assert np.max(np.abs(scaled_gradient(m, X, y))) <= 1e-8
 
 
 def test_n_less_than_d(rng):
     X, y = make_data(rng, n=10, d=40, k=3)
     m = LogisticRegression(C=0.1).fit(X, y)
     assert np.all(np.isfinite(m.coef_))
-    assert np.max(np.abs(scaled_gradient(m, X, y))) < 1e-7
+    assert np.max(np.abs(scaled_gradient(m, X, y))) <= 1e-8
 
 
 def test_string_labels_score_and_attributes(rng):
