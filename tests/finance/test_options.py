@@ -417,3 +417,18 @@ def test_quantlib_parity():
         amer.setPricingEngine(ql.BinomialVanillaEngine(process, "crr", 801))
         ours = binomial_price(S, K, T, r, sigma, q, kind, steps=801, american=True)
         assert ours == pytest.approx(amer.NPV(), rel=1e-5, abs=1e-8)
+
+
+def test_implied_volatility_never_rejects_bs_prices_random_grid():
+    """Review regression: deep-ITM prices 1 ulp below the bound used to be rejected."""
+    rng = np.random.default_rng(0)
+    n = 4000
+    S, K = rng.uniform(20, 200, n), rng.uniform(20, 200, n)
+    T, r = rng.uniform(0.01, 5, n), rng.uniform(-0.02, 0.1, n)
+    sig, q = rng.uniform(0.05, 1, n), rng.uniform(0, 0.05, n)
+    scale = np.maximum(S * np.exp(-q * T), K * np.exp(-r * T))
+    for kind in ("call", "put"):
+        price = bs_price(S, K, T, r, sig, q, kind)
+        iv = implied_volatility(price, S, K, T, r, q, kind)
+        err = np.abs(bs_price(S, K, T, r, iv, q, kind) - price)
+        assert np.all(err <= 1e-12 * scale)

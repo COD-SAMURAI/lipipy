@@ -440,8 +440,12 @@ def implied_volatility(
 ) -> float | np.ndarray:
     r"""Black-Scholes implied volatility by Brent's method on a guaranteed bracket.
 
-    Solves :math:`V_{BS}(\sigma) = \text{price}` (module docstring). A price equal to
-    the lower no-arbitrage bound gives :math:`\sigma = 0`. The root is found to an
+    Solves :math:`V_{BS}(\sigma) = \text{price}` (module docstring). For in-the-money
+    options (positive lower bound), a price within
+    :math:`8\varepsilon\max(Se^{-qT}, Ke^{-rT})` of the lower no-arbitrage bound is
+    treated as at the bound and gives :math:`\sigma = 0`: where vega underflows the
+    returned volatility reproduces the price (to that tolerance) but is not unique.
+    The root is found to an
     absolute tolerance of :math:`10^{-14}` in :math:`\sigma`; the repriced option
     then matches ``price`` to within rounding (how well :math:`\sigma` itself is
     determined depends on vega).
@@ -495,7 +499,11 @@ def implied_volatility(
         lower, upper = np.maximum(fwd_s - pv_k, 0.0), fwd_s
     else:
         lower, upper = np.maximum(pv_k - fwd_s, 0.0), pv_k
-    bad = (p < lower) | (p >= upper)
+    # Prices within a few ulps of the lower bound are at the bound: there sigma is
+    # not identifiable (vega underflows) and sigma = 0 reproduces the price.
+    # (A zero bound is exact, so out-of-the-money prices get no slack.)
+    slack = np.where(lower > 0.0, 8.0 * np.finfo(np.float64).eps * np.maximum(fwd_s, pv_k), 0.0)
+    bad = (p < lower - slack) | (p >= upper)
     if np.any(bad):
         i = np.flatnonzero(bad.ravel())[0]
         raise ValueError(
@@ -506,7 +514,7 @@ def implied_volatility(
     out = np.empty(p.shape)
     for idx in np.ndindex(p.shape):
         target = float(p[idx])
-        if target == lower[idx]:
+        if target <= lower[idx] + slack[idx]:
             out[idx] = 0.0
             continue
         args = tuple(np.asarray(a[idx]) for a in (S_, K_, T_, r_))
