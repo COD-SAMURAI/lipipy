@@ -92,6 +92,7 @@ from lipipy.numerics.optimize import (
     minimize_newton,
     newton,
 )
+from lipipy.numerics.sde import SDEResult, euler_maruyama, milstein
 from lipipy.numerics.special import (
     erf,
     erfc,
@@ -107,6 +108,9 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "milstein",
+    "euler_maruyama",
+    "SDEResult",
     "solve_ode",
     "ODEResult",
     "trapezoid",
