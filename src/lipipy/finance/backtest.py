@@ -8,13 +8,21 @@ from information up to and including :math:`t`, and are held over :math:`(t, t+1
 earning the asset returns :math:`R_{t+1} = P_{t+1}/P_t - 1`.
 
 * With a **strategy function**, ``weights_fn(history)`` is called with
-  ``history = prices[: t + 1]``, a **read-only view**: prices after :math:`t` do
-  not exist in it, so look-ahead is impossible by construction (indexing
-  ``history[t + 1]`` raises ``IndexError``, writing raises ``ValueError``).
+  ``history`` of shape ``(t + 1, A)`` holding ``prices[: t + 1]``, a read-only view
+  of a **separate buffer** that is filled one row at a time: when the strategy is
+  called at :math:`t`, rows after :math:`t` of that buffer are NaN. So no memory
+  reachable from ``history`` (``history.base``, strided views past its end, the
+  buffer after flipping its read-only flag) contains a price after :math:`t`;
+  ``history[t + 1]`` raises ``IndexError`` and writing raises ``ValueError``. The
+  accounting uses a private copy of the prices, so a strategy that tampers with its
+  buffer changes only what it sees itself, never the results. (Python cannot stop a
+  strategy from reading data it captured elsewhere, e.g. the caller's own price
+  array through a closure; the guarantee covers what the backtester hands over.)
 * With a **weights array** of shape ``(T, A)``, row :math:`t` is the target decided
   at :math:`t` (applied to :math:`R_{t+1}`; the last row is unused); shape ``(A,)``
-  means constant target weights. Make sure row :math:`t` only uses data up to
-  :math:`t`.
+  means constant target weights. A precomputed array is **trusted input**: lipipy
+  cannot check how it was built, so the no-look-ahead guarantee applies to the
+  callable API only.
 
 Portfolio accounting
 --------------------
@@ -137,7 +145,7 @@ def _rebalance_dates(rebalance: Any, T: int) -> np.ndarray:
 
 
 def _target(
-    weights: Any, history: np.ndarray, t: int, A: int, static: np.ndarray | None
+    weights: Any, history: np.ndarray | None, t: int, A: int, static: np.ndarray | None
 ) -> np.ndarray:
     if static is not None:
         return static[t] if static.ndim == 2 else static
@@ -179,9 +187,11 @@ def backtest(
     prices : array_like of shape (T, A) or (T, )
         Strictly positive prices, oldest first, ``T >= 2``.
     weights : callable or array_like
-        ``weights_fn(history) -> (A,)`` called at each rebalance date with the
-        read-only ``prices[: t + 1]``; or target weights of shape ``(T, A)``
-        (row ``t`` decided at ``t``) or ``(A,)`` (constant).
+        ``weights_fn(history) -> (A,)`` called at each rebalance date with a
+        read-only ``(t + 1, A)`` view of the prices up to ``t`` whose underlying
+        buffer holds no later prices (module docstring); or target weights of shape
+        ``(T, A)`` (row ``t`` decided at ``t``) or ``(A,)`` (constant). A weights
+        array is trusted input: the no-look-ahead guarantee covers the callable.
     rebalance : "every" or int, default="every"
         Rebalance at every step, or every ``k`` steps (``t = 0, k, 2k, ...``).
     cost_bps : float, default=0.0
@@ -221,8 +231,7 @@ def backtest(
     P = check_prices(prices)
     if P.ndim == 1:
         P = P[:, None]
-    P = P.copy()
-    P.flags.writeable = False  # strategies get read-only views
+    P = P.copy()  # private: the strategy never gets a view of this array
     T, A = P.shape
     dates = _rebalance_dates(rebalance, T)
     cost = (check_real(cost_bps, "cost_bps") + check_real(slippage_bps, "slippage_bps")) / 1e4
@@ -244,11 +253,21 @@ def backtest(
     turnover = np.zeros(T - 1)
     costs = np.zeros(T - 1)
     w_pre = np.zeros(A)  # start in cash
+    # What the strategy can see: a buffer revealed one row at a time (NaN = future).
+    seen = np.full((T, A), np.nan) if static is None else None
+    revealed = 0
     ruined = False
     bounds = np.append(dates, T - 1)
     for start, end in zip(bounds[:-1], bounds[1:], strict=True):
         t = int(start)
-        w = _target(weights, P[: t + 1], t, A, static)
+        history = None
+        if seen is not None:
+            seen.flags.writeable = True
+            seen[revealed : t + 1] = P[revealed : t + 1]
+            seen.flags.writeable = False
+            revealed = t + 1
+            history = seen[: t + 1]
+        w = _target(weights, history, t, A, static)
         turnover[t] = float(np.abs(w - w_pre).sum())
         costs[t] = turnover[t] * cost
         # Equity over (t, end], relative to E_t: cash (after costs) plus drifting positions.

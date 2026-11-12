@@ -54,6 +54,55 @@ def test_strategy_cannot_modify_prices():
         backtest(P, vandal)
 
 
+def _random_walks(seed=0, T=500, A=2):
+    r = np.random.default_rng(seed)
+    return 100 * np.exp(np.cumsum(r.normal(0, 0.01, (T, A)), axis=0))
+
+
+def test_no_future_prices_reachable_through_history_base():
+    """Review regression: history.base used to be the full price matrix."""
+    prices = _random_walks()
+    leaks = []
+
+    def cheater(history):
+        t = len(history) - 1
+        full = history.base
+        if full is None or t + 1 >= len(full):
+            return np.array([0.5, 0.5])
+        leaks.append(np.isfinite(full[t + 1 :]).any())
+        return np.eye(2)[int(np.argmax(full[t + 1] / full[t] - 1))]
+
+    res = backtest(prices, cheater)
+    assert leaks and not any(leaks)  # rows after t are all NaN
+    # argmax over NaN picks asset 0: the cheater is just "hold asset 0"
+    np.testing.assert_allclose(res.equity, backtest(prices, [1.0, 0.0]).equity, rtol=1e-12)
+    assert res.total_return == pytest.approx(prices[-1, 0] / prices[0, 0] - 1, rel=1e-10)
+
+
+def test_no_future_prices_through_strides_or_unlocking():
+    prices = _random_walks(1, T=60)
+
+    def strided(history):
+        t, A = history.shape[0] - 1, history.shape[1]
+        if t + 1 < len(prices):
+            beyond = np.lib.stride_tricks.as_strided(history, shape=(t + 2, A))
+            assert np.all(np.isnan(beyond[t + 1]))  # the next row exists only as NaN
+        return np.full(A, 0.5)
+
+    backtest(prices, strided)
+
+    def unlocker(history):
+        buf = history.base
+        buf.flags.writeable = True  # the buffer can be unlocked ...
+        assert np.all(np.isnan(buf[len(history) :]))  # ... but holds no future prices
+        buf[: len(history)] = 1.0  # tampering only affects what the strategy sees
+        return np.full(2, 0.5)
+
+    tampered = backtest(prices, unlocker)
+    honest = backtest(prices, [0.5, 0.5])
+    np.testing.assert_array_equal(tampered.equity, honest.equity)
+
+
 def test_weights_decided_at_t_earn_returns_from_t_to_t_plus_1():
     # a perfect-foresight weights array would be look-ahead; the engine applies row t
     # to (t, t+1], so an oracle must be shifted by the caller to profit.
