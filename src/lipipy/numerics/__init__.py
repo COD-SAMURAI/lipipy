@@ -57,6 +57,7 @@ Automatic differentiation
 [ ] Reverse mode (tape-based scalar and tensor autograd), gradient checking
 """
 
+from lipipy.numerics.fft import fft, fftconvolve, fftfreq, ifft, irfft, rfft, rfftfreq
 from lipipy.numerics.linalg import (
     cholesky,
     cholesky_solve,
@@ -95,6 +96,13 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "rfftfreq",
+    "rfft",
+    "irfft",
+    "ifft",
+    "fftfreq",
+    "fftconvolve",
+    "fft",
     "LineSearchResult",
     "OptimizeResult",
     "RootResult",
