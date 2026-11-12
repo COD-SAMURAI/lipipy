@@ -78,6 +78,7 @@ from lipipy.numerics.linalg import (
     qr,
     solve_triangular,
 )
+from lipipy.numerics.ode import ODEResult, solve_ode
 from lipipy.numerics.optimize import (
     LineSearchResult,
     OptimizeResult,
@@ -106,6 +107,8 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "solve_ode",
+    "ODEResult",
     "trapezoid",
     "simpson",
     "quad",
