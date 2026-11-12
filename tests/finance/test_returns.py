@@ -266,3 +266,5 @@ def test_capm_exact_line_and_errors():
         capm_alpha_beta([0.01, 0.02, 0.03], [0.01, 0.02])
     with pytest.raises(ValueError, match="market"):
         capm_alpha_beta(np.zeros((3, 2)), np.ones((3, 2)))
+    with pytest.raises(ValueError, match="risk_free"):
+        capm_alpha_beta(np.zeros((4, 2)), m, risk_free=np.zeros((4, 2)))

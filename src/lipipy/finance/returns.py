@@ -806,7 +806,9 @@ def capm_alpha_beta(
     rf = check_rate(risk_free, r, "risk_free")
     n = _check_ppy(periods_per_year)
     y = r - rf
-    rf_x = rf if np.ndim(rf) == 0 else np.asarray(rf).reshape(-1)
+    if np.ndim(rf) == 2 and np.shape(rf)[1] != 1:
+        raise ValueError("risk_free must be a scalar or a series of shape (T,) for CAPM")
+    rf_x = rf if np.ndim(rf) == 0 else np.asarray(rf).reshape(r.shape[0])
     x = m - rf_x
     xc = x - x.mean()
     sxx = float(xc @ xc)
