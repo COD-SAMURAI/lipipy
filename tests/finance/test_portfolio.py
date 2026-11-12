@@ -288,6 +288,12 @@ def test_risk_parity_two_assets_inverse_volatility(rho):
     np.testing.assert_allclose(risk_parity_weights(C), (1 / s) / (1 / s).sum(), atol=1e-12)
 
 
+def test_risk_parity_convergence_warning():
+    C = _cov(5, A=12, cond=1e5)
+    with pytest.warns(ConvergenceWarning, match="risk parity"):
+        risk_parity_weights(C, maxiter=1)
+
+
 def test_risk_parity_errors():
     with pytest.raises(ValueError, match="singular"):
         risk_parity_weights([[1.0, 1.0], [1.0, 1.0]])

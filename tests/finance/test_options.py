@@ -226,6 +226,16 @@ def test_implied_volatility_bounds_and_errors():
         implied_volatility([c, -1.0], 100.0, 100.0, 1.0, 0.05)
     with pytest.raises(ValueError, match="NaN"):
         implied_volatility(np.nan, 100.0, 100.0, 1.0, 0.05)
+    with pytest.raises(ValueError, match="broadcast"):
+        implied_volatility([1.0, 2.0], 100.0, [90.0, 100.0, 110.0], 1.0, 0.05)
+    # one ulp below the upper bound is still bracketed (the price reaches the bound
+    # in floating point at sigma sqrt(T) ~ 17, well inside the search range)
+    near = np.nextafter(100.0, 0.0)
+    iv = implied_volatility(near, 100.0, 100.0, 1.0, 0.0)
+    assert 10.0 < iv < 64.0 and bs_price(100.0, 100.0, 1.0, 0.0, iv) == pytest.approx(near)
+    # but a very short-dated option legitimately needs a huge volatility
+    huge = bs_price(100.0, 100.0, 1e-10, 0.0, 2e5)
+    assert implied_volatility(huge, 100.0, 100.0, 1e-10, 0.0) == pytest.approx(2e5, rel=1e-8)
     # huge volatility is still bracketed
     big = bs_price(100.0, 100.0, 1.0, 0.0, 8.0)
     assert implied_volatility(big, 100.0, 100.0, 1.0, 0.0) == pytest.approx(8.0, rel=1e-9)

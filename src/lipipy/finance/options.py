@@ -372,16 +372,17 @@ def bs_greeks(
 _XTOL = 1e-14
 
 
-def _bracket(f: Any, target: float, upper: float) -> tuple[float, float]:
+def _bracket(f: Any, target: float, upper: float, sqrt_t: float) -> tuple[float, float]:
     """[lo, hi] with f(lo) < 0 < f(hi) for increasing f with f(0) < 0 (module docstring).
 
     Doubling from 1 finds hi; halving from 1 moves lo off sigma = 0 so that f is not
-    numerically flat at the lower end of the bracket.
+    numerically flat at the lower end of the bracket. Beyond sigma sqrt(T) = 64 the
+    price differs from the upper bound by less than K Phi(-32) ~ 1e-225 K.
     """
     lo, hi = 0.0, 1.0
     while f(hi) <= 0.0:
         lo, hi = hi, 2.0 * hi
-        if hi > 2.0**20:
+        if hi * sqrt_t > 64.0:  # defensive: V(sigma) rounds to the bound well before
             raise ValueError(
                 f"price {target!r} is within rounding of the upper bound {upper!r}; "
                 "implied volatility is not identifiable"
@@ -407,8 +408,8 @@ def _bisect(f: Any, lo: float, hi: float) -> float:
     return 0.5 * (lo + hi)
 
 
-def _solve_bracketed(f: Any, target: float, upper: float) -> float:
-    lo, hi = _bracket(f, target, upper)
+def _solve_bracketed(f: Any, target: float, upper: float, sqrt_t: float) -> float:
+    lo, hi = _bracket(f, target, upper, sqrt_t)
     try:
         return float(brentq(f, lo, hi, xtol=_XTOL).root)
     except ZeroDivisionError:
@@ -514,7 +515,7 @@ def implied_volatility(
         def f(sig: float, target: float = target, args: tuple = args, qi: Any = qi) -> float:
             return float(_bs(*args, np.asarray(sig), qi, kind)) - target
 
-        out[idx] = _solve_bracketed(f, target, float(upper[idx]))
+        out[idx] = _solve_bracketed(f, target, float(upper[idx]), float(np.sqrt(T_[idx])))
     return scalar_or_array(out)
 
 
@@ -608,13 +609,25 @@ def binomial_price(
         )
     disc = np.exp(-r * dt)
     # Node prices S u^(2j - i): all exponents -N..N on one grid of 2N + 1 values.
-    grid = S * np.exp(h * np.arange(-N, N + 1))
-    V = np.maximum(sign * (grid[0 : 2 * N + 1 : 2] - K), 0.0)  # step N: exponents -N, -N+2, ...
+    # (built in place: three float arrays of length ~N to 2N are all the memory used)
+    grid = np.arange(-N, N + 1, dtype=np.float64)
+    grid *= h
+    np.exp(grid, out=grid)
+    grid *= S
+    V = grid[0 : 2 * N + 1 : 2] - K  # step N: exponents -N, -N+2, ..., N
+    V *= sign
+    np.maximum(V, 0.0, out=V)
+    up, down = disc * p, disc * (1.0 - p)
+    buf = np.empty(N)  # scratch space, so each step allocates nothing
     for i in range(N - 1, -1, -1):
-        V[: i + 1] = disc * (p * V[1 : i + 2] + (1.0 - p) * V[: i + 1])
+        v, b = V[: i + 1], buf[: i + 1]
+        np.multiply(V[1 : i + 2], up, out=b)  # read V_{i+1, j+1} before overwriting
+        v *= down
+        v += b
         if american:
-            exercise = np.maximum(sign * (grid[N - i : N + i + 1 : 2] - K), 0.0)
-            np.maximum(V[: i + 1], exercise, out=V[: i + 1])
+            np.subtract(grid[N - i : N + i + 1 : 2], K, out=b)
+            b *= sign
+            np.maximum(v, b, out=v)  # exercise value (<= 0 parts never win: v >= 0)
     return float(V[0])
 
 
