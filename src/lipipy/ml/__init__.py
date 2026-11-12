@@ -26,7 +26,7 @@ Supervised learning: regression
 Supervised learning: classification
 -----------------------------------
 [ ] Perceptron
-[ ] Logistic regression (binary, multinomial / softmax)
+[x] Logistic regression (binary, multinomial / softmax)
 [ ] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
 [x] Naive Bayes: Gaussian
 [ ] Naive Bayes: multinomial, Bernoulli, complement
@@ -40,12 +40,14 @@ Supervised learning: classification
 
 Trees and ensembles
 -------------------
-[ ] Decision trees: ID3, C4.5, CART (Gini, entropy, MSE splits; pruning)
+[x] Decision trees: CART (Gini, entropy, MSE splits)
+[ ] Decision trees: ID3, C4.5, cost-complexity pruning
 [ ] Bagging
-[ ] Random forest
+[x] Random forest
 [ ] Extremely randomized trees (Extra-Trees)
 [ ] AdaBoost (SAMME, SAMME.R)
-[ ] Gradient boosting machines
+[x] Gradient boosting machines (squared error, binary log loss)
+[ ] Gradient boosting: multiclass, Huber / quantile losses
 [ ] XGBoost-style boosting (second-order, regularized)
 [ ] LightGBM-style histogram boosting (GOSS, EFB)
 [ ] CatBoost-style ordered boosting
@@ -150,7 +152,13 @@ Model selection, evaluation and preprocessing
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
 from lipipy.ml.cluster import KMeans
 from lipipy.ml.decomposition import PCA
-from lipipy.ml.linear import LinearRegression, Ridge
+from lipipy.ml.ensemble import (
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
+)
+from lipipy.ml.linear import LinearRegression, LogisticRegression, Ridge
 from lipipy.ml.metrics import (
     PrecisionRecallF1,
     adjusted_rand_score,
@@ -161,18 +169,27 @@ from lipipy.ml.metrics import (
 )
 from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 
 __all__ = [
     "PCA",
     "ClassifierMixin",
+    "DecisionTreeClassifier",
+    "DecisionTreeRegressor",
     "GaussianNB",
+    "GradientBoostingClassifier",
+    "GradientBoostingRegressor",
     "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
     "LinearRegression",
+    "LogisticRegression",
     "PrecisionRecallF1",
+    "RandomForestClassifier",
+    "RandomForestRegressor",
     "Ridge",
     "TransformerMixin",
+    "Tree",
     "adjusted_rand_score",
     "confusion_matrix",
     "mean_absolute_error",
