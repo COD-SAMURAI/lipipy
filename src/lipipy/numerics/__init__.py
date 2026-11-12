@@ -58,6 +58,16 @@ Automatic differentiation
 """
 
 from lipipy.numerics.fft import fft, fftconvolve, fftfreq, ifft, irfft, rfft, rfftfreq
+from lipipy.numerics.integrate import (
+    MonteCarloResult,
+    QuadResult,
+    gauss_legendre,
+    gauss_legendre_nodes,
+    monte_carlo,
+    quad,
+    simpson,
+    trapezoid,
+)
 from lipipy.numerics.linalg import (
     cholesky,
     cholesky_solve,
@@ -96,6 +106,14 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "trapezoid",
+    "simpson",
+    "quad",
+    "monte_carlo",
+    "gauss_legendre_nodes",
+    "gauss_legendre",
+    "QuadResult",
+    "MonteCarloResult",
     "rfftfreq",
     "rfft",
     "irfft",
