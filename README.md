@@ -67,13 +67,13 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design.
 | Layer | Package | What goes there | Status |
 |---|---|---|---|
 | 0 | `lipipy.core` | registry, complexity metadata, backends, randomness, errors, validation | started |
-| 1 | `lipipy.numerics` | linear algebra, optimization, integration, ODEs, FFT, statistics, autodiff | special functions (`erf`, normal cdf/ppf, stable softmax), streaming moments, LU / Cholesky / QR, GD / Newton / BFGS / L-BFGS, Brent and Newton roots |
+| 1 | `lipipy.numerics` | linear algebra, optimization, integration, ODEs, FFT, statistics, autodiff | special functions (`erf`, normal cdf/ppf, stable softmax), streaming moments, LU / Cholesky / QR, GD / Newton / BFGS / L-BFGS, Brent and Newton roots, FFT (any length), quadrature (incl. adaptive Gauss–Kronrod), ODE solvers (RK4, RK45, implicit Euler), SDE solvers (Euler–Maruyama, Milstein), cubic splines |
 | 1 | `lipipy.bench` | empirical time/space complexity measurement | `estimate_complexity` |
-| 2 | `lipipy.ml` | classic ML in NumPy: linear models, trees, SVM, clustering, PCA, boosting | `LinearRegression`, `Ridge`, k-nearest neighbours, `KMeans`, `PCA`, `GaussianNB`, metrics |
+| 2 | `lipipy.ml` | classic ML in NumPy: linear models, trees, SVM, clustering, PCA, boosting | `LinearRegression`, `Ridge`, k-nearest neighbours, `KMeans`, `PCA`, `GaussianNB`, `LogisticRegression`, CART decision trees, random forests, gradient boosting, metrics |
 | 2 | `lipipy.ai` | classical AI: search, logic, constraint satisfaction, planning, causality | planned |
 | 2 | `lipipy.dl` | autograd, layers, attention, CNN/RNN, transformer, optimizers | planned |
 | 2 | `lipipy.quantum` | circuits, statevector / density-matrix / MPS simulators, Grover, QFT, VQE, QAOA | gates, statevector simulator, `Circuit`, QFT, Grover, Deutsch-Jozsa, Bernstein-Vazirani, phase estimation |
-| 2 | `lipipy.finance` | returns, risk, portfolios, option pricing, backtesting (research only) | planned |
+| 2 | `lipipy.finance` | returns, risk, portfolios, option pricing, backtesting (research only) | returns and drawdowns, VaR / expected shortfall, Ledoit–Wolf, Black–Scholes and Greeks, implied volatility, binomial and Monte Carlo pricing, Markowitz / risk parity / Black–Litterman, look-ahead-free backtester |
 | 3 | `lipipy.rl` | bandits, DQN, PPO, SAC, MCTS | planned |
 | 3 | `lipipy.research` | SSMs/Mamba, mixture-of-experts, diffusion, KANs + benchmark harness | planned |
 | 3 | `lipipy.interpret` | probing, attribution, mechanistic interpretability | planned |
