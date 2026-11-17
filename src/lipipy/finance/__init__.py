@@ -62,6 +62,15 @@ Trading and execution
 """
 
 from lipipy.finance.backtest import BacktestResult, backtest
+from lipipy.finance.exotics import (
+    arithmetic_asian_mc,
+    barrier_mc,
+    barrier_price,
+    geometric_asian_price,
+    heston_price,
+    lookback_mc,
+    merton_jump_price,
+)
 from lipipy.finance.kalman import (
     FilterResult,
     HedgeRatioResult,
@@ -128,6 +137,13 @@ from lipipy.finance.timeseries import (
 from lipipy.finance.volatility import GarchResult, garch, gjr_garch
 
 __all__ = [
+    "arithmetic_asian_mc",
+    "barrier_mc",
+    "barrier_price",
+    "geometric_asian_price",
+    "heston_price",
+    "lookback_mc",
+    "merton_jump_price",
     "FilterResult",
     "HedgeRatioResult",
     "KalmanFilter",
