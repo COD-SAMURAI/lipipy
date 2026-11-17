@@ -85,6 +85,7 @@ from lipipy.ai.csp import (
     backtracking_search,
     min_conflicts,
 )
+from lipipy.ai.sat import CNF, SATResult, cdcl, dpll, parse_dimacs, walksat
 from lipipy.ai.search import (
     GraphProblem,
     SearchProblem,
@@ -102,6 +103,12 @@ from lipipy.ai.search import (
 )
 
 __all__ = [
+    "CNF",
+    "SATResult",
+    "cdcl",
+    "dpll",
+    "parse_dimacs",
+    "walksat",
     "AC3Result",
     "CSP",
     "CSPResult",
