@@ -15,9 +15,11 @@ states and transitions reachable from the start.
 
 Algorithms
 ----------
-All are **graph searches** with a reached set (except the depth-limited family and
-IDA*, which are tree searches that only reject states already on the current path, so
-they use :math:`O(bd)` memory).
+All are **graph searches** with a reached set, except the depth-limited family and
+IDA*: these are tree searches that only reject states already on the current path,
+so they use :math:`O(bd)` memory but may reach a state along many different paths
+(exponential time on graphs with many cycles, and when the goal is unreachable they
+enumerate every simple path).
 
 * ``breadth_first`` - FIFO frontier, goal test when a state is generated; fewest actions.
 * ``depth_first`` - LIFO frontier. Without a limit it is a graph search; with

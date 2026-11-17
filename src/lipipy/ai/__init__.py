@@ -75,6 +75,16 @@ Causality
 [ ] Treatment-effect estimation (propensity scores, IPW, doubly robust)
 """
 
+from lipipy.ai.csp import (
+    CSP,
+    AC3Result,
+    Constraint,
+    CSPResult,
+    ac3,
+    all_different,
+    backtracking_search,
+    min_conflicts,
+)
 from lipipy.ai.search import (
     GraphProblem,
     SearchProblem,
@@ -92,6 +102,14 @@ from lipipy.ai.search import (
 )
 
 __all__ = [
+    "AC3Result",
+    "CSP",
+    "CSPResult",
+    "Constraint",
+    "ac3",
+    "all_different",
+    "backtracking_search",
+    "min_conflicts",
     "GraphProblem",
     "SearchProblem",
     "SearchResult",
