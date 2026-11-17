@@ -39,6 +39,15 @@ from lipipy.quantum._validation import (
     check_square_matrix,
     check_state,
 )
+from lipipy.quantum.density import (
+    MAX_DENSITY_QUBITS,
+    DensityMatrix,
+    _channel,
+    _check_density_qubits,
+    _diagonal_sandwich,
+    _sandwich,
+)
+from lipipy.quantum.noise import NoiseModel
 from lipipy.quantum.statevector import _apply_diagonal_tensor, _apply_tensor
 
 #: Largest circuit for which :meth:`Circuit.to_matrix` builds the dense unitary.
@@ -46,7 +55,7 @@ MAX_MATRIX_QUBITS = 10
 
 _SELF_INVERSE = {"id", "x", "y", "z", "h", "cx", "cz", "swap", "ccx"}
 _INVERSE_NAME = {"s": "sdg", "sdg": "s", "t": "tdg", "tdg": "t", "sx": "sxdg", "sxdg": "sx"}
-_NEGATE_PARAMS = {"rx", "ry", "rz", "p", "cp"}
+_NEGATE_PARAMS = {"rx", "ry", "rz", "p", "cp", "rzz"}
 
 
 @dataclass(frozen=True, eq=False)
@@ -282,6 +291,14 @@ class Circuit:
         diag = np.array([1, 1, 1, np.exp(1j * lam)], dtype=np.complex128)
         return self._append(Instruction("cp", tgts, (lam,), diagonal=diag))
 
+    def rzz(self, theta: float, qubit1: int, qubit2: int) -> Circuit:
+        """Ising coupling exp(-i theta Z⊗Z / 2) = diag(e^{-iθ/2}, e^{iθ/2}, e^{iθ/2}, e^{-iθ/2})."""
+        theta = check_angle(theta, "theta")
+        tgts = check_qubits([qubit1, qubit2], self.num_qubits, "qubits")
+        a, b = np.exp(-0.5j * theta), np.exp(0.5j * theta)
+        diag = np.array([a, b, b, a], dtype=np.complex128)
+        return self._append(Instruction("rzz", tgts, (theta,), diagonal=diag))
+
     def swap(self, qubit1: int, qubit2: int) -> Circuit:
         """SWAP two qubits."""
         return self._gate("swap", gates.SWAP, [qubit1, qubit2])
@@ -375,6 +392,61 @@ class Circuit:
         N = 2**q
         tensor = np.eye(N, dtype=np.complex128).reshape((2,) * q + (N,))
         return self._run_tensor(tensor).reshape(N, N)
+
+    def run_density(
+        self,
+        initial_state: DensityMatrix | np.ndarray | None = None,
+        *,
+        noise_model: NoiseModel | None = None,
+        max_qubits: int = MAX_DENSITY_QUBITS,
+    ) -> DensityMatrix:
+        """Simulate the circuit on density matrices, optionally with noise.
+
+        After each instruction, the channels that ``noise_model`` matches for it are
+        applied (see :class:`~lipipy.quantum.NoiseModel`). Without noise the result is
+        :math:`|\\psi\\rangle\\langle\\psi|` of :meth:`run`.
+
+        Parameters
+        ----------
+        initial_state : DensityMatrix or statevector, optional
+            Defaults to :math:`|0\\ldots0\\rangle\\langle 0\\ldots0|`.
+        noise_model : NoiseModel, optional
+            Noise applied after the gates it matches.
+        max_qubits : int, default=13
+            Raise :class:`~lipipy.core.ResourceLimitError` before allocating when the
+            circuit has more qubits (memory 16·4^q bytes).
+
+        Returns
+        -------
+        DensityMatrix
+            Time O(g · 4^q · 2^k) plus O(r · 4^q · 2^k) per applied channel of rank r.
+        """
+        q = _check_density_qubits(self.num_qubits, max_qubits)
+        if noise_model is not None and not isinstance(noise_model, NoiseModel):
+            raise TypeError(f"noise_model must be a NoiseModel, got {type(noise_model).__name__}")
+        if initial_state is None:
+            R = np.zeros((2**q, 2**q), dtype=np.complex128)
+            R[0, 0] = 1.0
+        elif isinstance(initial_state, DensityMatrix):
+            if initial_state.num_qubits != q:
+                raise ValueError(
+                    f"initial_state has {initial_state.num_qubits} qubits, the circuit has {q}"
+                )
+            R = initial_state.data
+        else:
+            rho0 = DensityMatrix.from_state(initial_state, max_qubits=max_qubits)
+            if rho0.num_qubits != q:
+                raise ValueError(f"initial_state has {rho0.num_qubits} qubits, the circuit has {q}")
+            R = rho0.data
+        for op in self._ops:
+            if op.diagonal is not None:
+                R = _diagonal_sandwich(R, op.diagonal, op.qubits, q)
+            else:
+                R = _sandwich(R, op.matrix, op.qubits, q)
+            if noise_model is not None:
+                for channel, targets in noise_model.channels_for(op.name, op.qubits):
+                    R = _channel(R, channel, targets, q)
+        return DensityMatrix._trusted(R, q)
 
     # -- transformations ---------------------------------------------------------------
     def copy(self) -> Circuit:
