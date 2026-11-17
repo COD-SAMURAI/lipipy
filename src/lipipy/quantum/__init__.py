@@ -43,12 +43,14 @@ Foundations
 Circuits and simulators
 -----------------------
 [x] ``Circuit`` builder (fluent API): run, to_matrix, inverse, compose, depth, count_ops
-[ ] Symbolic parameters for variational circuits
+[x] Symbolic parameters for variational circuits (``ParametricCircuit``, affine angles)
 [x] Statevector simulator (apply k-qubit gate in O(2^q) time without building 2^q x 2^q matrices)
 [x] Measurement, sampling shots, expectation values of Pauli strings
-[ ] Density-matrix simulator with noise channels (depolarizing, amplitude/phase damping)
+[x] Density-matrix simulator with noise channels (bit/phase flip, depolarizing,
+    amplitude/phase damping, generic Kraus) and noise models
+[x] Pauli-sum observables (expectation in O(terms 2^q)); Ising and H2 Hamiltonians
 [ ] Matrix-product-state (tensor network) simulator
-[ ] Clifford / stabilizer simulator (Gottesman-Knill, polynomial time)
+[x] Clifford / stabilizer simulator (Gottesman-Knill, polynomial time; CHP tableau)
 
 Algorithms
 ----------
@@ -63,9 +65,10 @@ Algorithms
 
 Variational and quantum machine learning
 ----------------------------------------
-[ ] Parameter-shift gradients
-[ ] VQE (variational quantum eigensolver) with Pauli Hamiltonians
-[ ] QAOA for MaxCut and other QUBO problems
+[x] Parameter-shift gradients
+[x] VQE (variational quantum eigensolver) with Pauli Hamiltonians
+[x] QAOA for MaxCut
+[ ] QAOA for general QUBO problems
 [ ] Quantum kernels and variational classifiers
 
 Error correction
@@ -87,6 +90,7 @@ from lipipy.quantum.algorithms import (
     qft,
 )
 from lipipy.quantum.circuit import MAX_MATRIX_QUBITS, Circuit, Instruction
+from lipipy.quantum.density import MAX_DENSITY_QUBITS, DensityMatrix, DensityMeasurementResult
 from lipipy.quantum.gates import (
     CCX,
     CX,
@@ -109,6 +113,31 @@ from lipipy.quantum.gates import (
     ry,
     rz,
     u3,
+)
+from lipipy.quantum.noise import (
+    KrausChannel,
+    NoiseModel,
+    NoiseRule,
+    amplitude_damping,
+    bit_flip,
+    depolarizing,
+    phase_damping,
+    phase_flip,
+)
+from lipipy.quantum.observables import (
+    H2_COEFFICIENTS,
+    H2_NUCLEAR_REPULSION,
+    MAX_OBSERVABLE_MATRIX_QUBITS,
+    PauliSum,
+    h2_hamiltonian,
+    ising_chain,
+    maxcut_hamiltonian,
+)
+from lipipy.quantum.stabilizer import (
+    MAX_STABILIZER_QUBITS,
+    StabilizerMeasurement,
+    StabilizerState,
+    stabilizer_sample_counts,
 )
 from lipipy.quantum.states import (
     basis_state,
@@ -182,4 +211,51 @@ __all__ = [
     "tensor",
     "u3",
     "zero_state",
+    "MAX_DENSITY_QUBITS",
+    "DensityMatrix",
+    "DensityMeasurementResult",
+    "KrausChannel",
+    "NoiseModel",
+    "NoiseRule",
+    "amplitude_damping",
+    "bit_flip",
+    "depolarizing",
+    "phase_damping",
+    "phase_flip",
+    "H2_COEFFICIENTS",
+    "H2_NUCLEAR_REPULSION",
+    "MAX_OBSERVABLE_MATRIX_QUBITS",
+    "PauliSum",
+    "h2_hamiltonian",
+    "ising_chain",
+    "maxcut_hamiltonian",
+    "MAX_STABILIZER_QUBITS",
+    "StabilizerMeasurement",
+    "StabilizerState",
+    "stabilizer_sample_counts",
+    "Parameter",
+    "ParameterExpression",
+    "ParametricCircuit",
+    "QAOAResult",
+    "VQEResult",
+    "expectation_value",
+    "parameter_shift_gradient",
+    "qaoa_circuit",
+    "qaoa_maxcut",
+    "real_amplitudes",
+    "vqe",
 ]
+
+from lipipy.quantum.variational import (  # noqa: E402 (needs numerics; keep last)
+    Parameter,
+    ParameterExpression,
+    ParametricCircuit,
+    QAOAResult,
+    VQEResult,
+    expectation_value,
+    parameter_shift_gradient,
+    qaoa_circuit,
+    qaoa_maxcut,
+    real_amplitudes,
+    vqe,
+)
