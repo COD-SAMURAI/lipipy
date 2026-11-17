@@ -106,6 +106,7 @@ from lipipy.finance.risk import (
     sample_covariance,
     value_at_risk,
 )
+from lipipy.finance.volatility import GarchResult, garch, gjr_garch
 
 __all__ = [
     "BacktestResult",
@@ -113,6 +114,7 @@ __all__ = [
     "CAPMResult",
     "DrawdownResult",
     "EfficientFrontier",
+    "GarchResult",
     "Greeks",
     "LedoitWolfResult",
     "MonteCarloResult",
@@ -130,6 +132,8 @@ __all__ = [
     "efficient_frontier",
     "ewma_covariance",
     "expected_shortfall",
+    "garch",
+    "gjr_garch",
     "implied_volatility",
     "information_ratio",
     "ledoit_wolf",
