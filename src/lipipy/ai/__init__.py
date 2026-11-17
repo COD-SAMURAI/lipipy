@@ -74,3 +74,35 @@ Causality
 [ ] Causal discovery (PC algorithm, GES)
 [ ] Treatment-effect estimation (propensity scores, IPW, doubly robust)
 """
+
+from lipipy.ai.search import (
+    GraphProblem,
+    SearchProblem,
+    SearchResult,
+    SlidingPuzzle,
+    astar,
+    bidirectional_bfs,
+    breadth_first,
+    depth_first,
+    greedy_best_first,
+    ida_star,
+    iterative_deepening,
+    uniform_cost,
+    weighted_astar,
+)
+
+__all__ = [
+    "GraphProblem",
+    "SearchProblem",
+    "SearchResult",
+    "SlidingPuzzle",
+    "astar",
+    "bidirectional_bfs",
+    "breadth_first",
+    "depth_first",
+    "greedy_best_first",
+    "ida_star",
+    "iterative_deepening",
+    "uniform_cost",
+    "weighted_astar",
+]
