@@ -49,3 +49,29 @@ def random_unitary(dim: int, rng: np.random.Generator) -> np.ndarray:
 def random_state(num_qubits: int, rng: np.random.Generator) -> np.ndarray:
     z = rng.standard_normal(2**num_qubits) + 1j * rng.standard_normal(2**num_qubits)
     return z / np.linalg.norm(z)
+
+
+def random_density(
+    num_qubits: int, rng: np.random.Generator, rank: int | None = None
+) -> np.ndarray:
+    """Random density matrix G G^† / Tr(G G^†) with G of shape (2^q, rank)."""
+    d = 2**num_qubits
+    r = d if rank is None else rank
+    G = rng.standard_normal((d, r)) + 1j * rng.standard_normal((d, r))
+    rho = G @ G.conj().T
+    return rho / np.trace(rho).real
+
+
+def partial_trace_out(rho: np.ndarray, keep: Sequence[int], num_qubits: int) -> np.ndarray:
+    """Reference partial trace by explicit index loops (keep[0] = least significant)."""
+    rest = [j for j in range(num_qubits) if j not in keep]
+    K = 2 ** len(keep)
+    out = np.zeros((K, K), dtype=complex)
+    N = 2**num_qubits
+    for i in range(N):
+        for i2 in range(N):
+            if all(((i >> j) & 1) == ((i2 >> j) & 1) for j in rest):
+                a = sum(((i >> t) & 1) << n for n, t in enumerate(keep))
+                a2 = sum(((i2 >> t) & 1) << n for n, t in enumerate(keep))
+                out[a, a2] += rho[i, i2]
+    return out
