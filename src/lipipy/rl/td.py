@@ -856,6 +856,9 @@ mc_control.__doc__ = r"""On-policy first-visit Monte Carlo control, epsilon-soft
     :math:`G \leftarrow \gamma G + R_{t+1}`, and at the first visit of
     :math:`(S_t, A_t)` move :math:`Q(S_t, A_t)` to the average of its returns.
     An episode cut by a time limit is used as is (its returns are truncated).
+    The method converges to the best epsilon-soft policy (not the best
+    deterministic one), and slowly: the sample averages keep the returns of the
+    early, worse policies.
 
     Parameters
     ----------
