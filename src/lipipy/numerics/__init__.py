@@ -12,9 +12,11 @@ Linear algebra
 [ ] Least squares (normal equations, SVD), pseudo-inverse
 [ ] Eigenvalues: power iteration, inverse iteration, QR algorithm, Lanczos, Arnoldi
 [ ] SVD (one-sided Jacobi, randomized SVD)
-[ ] Iterative solvers: Jacobi, Gauss-Seidel, SOR, conjugate gradient, GMRES
+[x] Iterative solvers: conjugate gradient (Jacobi / user preconditioner), restarted GMRES
+[ ] Iterative solvers: Jacobi, Gauss-Seidel, SOR
 [ ] Matrix functions: expm (scaling and squaring), sqrtm, logm
-[ ] Sparse matrices (COO, CSR, CSC) and sparse matvec
+[x] Sparse matrices: CSR (from dense / COO triplets), matvec and matmat
+[ ] Sparse matrices: COO, CSC formats
 
 Roots and optimization
 ----------------------
@@ -53,14 +55,28 @@ Statistics and probability
 [ ] Distributions: pdf / cdf / sampling for the common families
 [x] Special functions: erf, erfc, log-sum-exp, softmax, log-softmax, sigmoid, softplus
 [ ] Special functions: gamma, beta
-[ ] Random number generation helpers, quasi-random sequences (Sobol, Halton)
+[x] Quasi-random sequences: Sobol (21 dims), Halton (optional scrambling), L2-star discrepancy
+[ ] Random number generation helpers
 
 Automatic differentiation
 -------------------------
-[ ] Forward mode (dual numbers)
-[ ] Reverse mode (tape-based scalar and tensor autograd), gradient checking
+[x] Forward mode (dual numbers), derivative, Jacobian-vector products
+[x] Reverse mode (tensor autograd with broadcasting), grad / value_and_grad, gradient checking
 """
 
+from lipipy.numerics.autodiff import (
+    Dual,
+    Tensor,
+    check_grad,
+    concatenate,
+    derivative,
+    grad,
+    jvp,
+    maximum,
+    stack,
+    value_and_grad,
+    where,
+)
 from lipipy.numerics.fft import fft, fftconvolve, fftfreq, ifft, irfft, rfft, rfftfreq
 from lipipy.numerics.integrate import (
     MonteCarloResult,
@@ -73,6 +89,7 @@ from lipipy.numerics.integrate import (
     trapezoid,
 )
 from lipipy.numerics.interpolate import CubicSpline, interp_linear
+from lipipy.numerics.iterative import IterativeResult, conjugate_gradient, gmres
 from lipipy.numerics.linalg import (
     cholesky,
     cholesky_solve,
@@ -97,7 +114,9 @@ from lipipy.numerics.optimize import (
     minimize_newton,
     newton,
 )
+from lipipy.numerics.qmc import halton, l2_star_discrepancy, sobol
 from lipipy.numerics.sde import SDEResult, euler_maruyama, milstein
+from lipipy.numerics.sparse import CSRMatrix
 from lipipy.numerics.special import (
     erf,
     erfc,
@@ -113,7 +132,10 @@ from lipipy.numerics.special import (
 from lipipy.numerics.stats import RunningMoments, correlation, covariance
 
 __all__ = [
+    "CSRMatrix",
     "CubicSpline",
+    "Dual",
+    "IterativeResult",
     "LineSearchResult",
     "MonteCarloResult",
     "ODEResult",
@@ -122,11 +144,16 @@ __all__ = [
     "RootResult",
     "RunningMoments",
     "SDEResult",
+    "Tensor",
     "brentq",
+    "check_grad",
     "cholesky",
     "cholesky_solve",
+    "concatenate",
+    "conjugate_gradient",
     "correlation",
     "covariance",
+    "derivative",
     "det",
     "erf",
     "erfc",
@@ -136,9 +163,14 @@ __all__ = [
     "fftfreq",
     "gauss_legendre",
     "gauss_legendre_nodes",
+    "gmres",
+    "grad",
+    "halton",
     "ifft",
     "interp_linear",
     "irfft",
+    "jvp",
+    "l2_star_discrepancy",
     "line_search_armijo",
     "log_sigmoid",
     "log_softmax",
@@ -146,6 +178,7 @@ __all__ = [
     "lstsq_qr",
     "lu",
     "lu_solve",
+    "maximum",
     "milstein",
     "minimize",
     "minimize_bfgs",
@@ -162,9 +195,13 @@ __all__ = [
     "rfftfreq",
     "sigmoid",
     "simpson",
+    "sobol",
     "softmax",
     "softplus",
     "solve_ode",
     "solve_triangular",
+    "stack",
     "trapezoid",
+    "value_and_grad",
+    "where",
 ]
