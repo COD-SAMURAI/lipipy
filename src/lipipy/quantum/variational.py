@@ -50,13 +50,27 @@ from lipipy.core.complexity import Complexity
 from lipipy.core.random import RandomState, check_random_state
 from lipipy.core.registry import register
 from lipipy.numerics import minimize
+from lipipy.quantum import gates
 from lipipy.quantum._validation import check_angle, check_int, check_qubits
-from lipipy.quantum.circuit import Circuit
+from lipipy.quantum.circuit import Circuit, Instruction
 from lipipy.quantum.observables import PauliSum, _check_edges, maxcut_hamiltonian
 
 _SHIFT = math.pi / 2
-_FIXED = {"h", "x", "y", "z", "s", "sdg", "t", "tdg", "sx", "cx", "cz", "swap", "ccx"}
-_ROTATIONS = {"rx": 1, "ry": 1, "rz": 1, "p": 1, "rzz": 2}
+_FIXED_MATRICES = {
+    "h": gates.H,
+    "x": gates.X,
+    "y": gates.Y,
+    "z": gates.Z,
+    "s": gates.S,
+    "sdg": gates.SDG,
+    "t": gates.T,
+    "tdg": gates.TDG,
+    "sx": gates.SX,
+    "cx": gates.CX,
+    "cz": gates.CZ,
+    "swap": gates.SWAP,
+    "ccx": gates.CCX,
+}
 
 
 @dataclass(frozen=True)
@@ -135,6 +149,26 @@ class ParameterExpression:
 
 
 Angle = float | Parameter | ParameterExpression
+
+
+def _rotation(name: str, qubits: tuple[int, ...], theta: float) -> Instruction:
+    """The same instruction as ``Circuit.<name>(theta, *qubits)``, built without re-validation."""
+    c, s = math.cos(theta / 2), math.sin(theta / 2)
+    if name == "rx":
+        return Instruction(
+            name, qubits, (theta,), _matrix=np.array([[c, -1j * s], [-1j * s, c]], complex)
+        )
+    if name == "ry":
+        return Instruction(name, qubits, (theta,), _matrix=np.array([[c, -s], [s, c]], complex))
+    if name == "rz":
+        diag = np.array([c - 1j * s, c + 1j * s])
+    elif name == "p":
+        diag = np.array([1.0, np.exp(1j * theta)])
+    else:  # rzz
+        diag = np.array([c - 1j * s, c + 1j * s, c + 1j * s, c - 1j * s])
+    if name in ("rz", "p"):  # Circuit.rz / Circuit.p store dense matrices
+        return Instruction(name, qubits, (theta,), _matrix=np.diag(diag).astype(np.complex128))
+    return Instruction(name, qubits, (theta,), diagonal=diag.astype(np.complex128))
 
 
 @dataclass(frozen=True)
@@ -318,10 +352,12 @@ class ParametricCircuit:
         return x
 
     def _bind(self, x: np.ndarray, shift_op: int = -1, delta: float = 0.0) -> Circuit:
+        # Qubits and fixed angles were validated when the gates were added, so the
+        # instructions are built directly (this is the hot loop of the gradient).
         circ = Circuit(self.num_qubits)
         for k, op in enumerate(self._ops):
             if op.angle is None:
-                getattr(circ, op.name)(*op.qubits)
+                circ._append(Instruction(op.name, op.qubits, _matrix=_FIXED_MATRICES[op.name]))
                 continue
             if isinstance(op.angle, ParameterExpression):
                 theta = op.angle.value(float(x[self._params[op.angle.parameter]]))
@@ -329,7 +365,7 @@ class ParametricCircuit:
                 theta = op.angle
             if k == shift_op:
                 theta += delta
-            getattr(circ, op.name)(theta, *op.qubits)
+            circ._append(_rotation(op.name, op.qubits, theta))
         return circ
 
     def bind(
