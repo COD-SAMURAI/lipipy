@@ -62,6 +62,13 @@ Trading and execution
 """
 
 from lipipy.finance.backtest import BacktestResult, backtest
+from lipipy.finance.kalman import (
+    FilterResult,
+    HedgeRatioResult,
+    KalmanFilter,
+    SmootherResult,
+    dynamic_hedge_ratio,
+)
 from lipipy.finance.options import (
     Greeks,
     MonteCarloResult,
@@ -121,6 +128,11 @@ from lipipy.finance.timeseries import (
 from lipipy.finance.volatility import GarchResult, garch, gjr_garch
 
 __all__ = [
+    "FilterResult",
+    "HedgeRatioResult",
+    "KalmanFilter",
+    "SmootherResult",
+    "dynamic_hedge_ratio",
     "ADFResult",
     "ARResult",
     "CointegrationResult",
