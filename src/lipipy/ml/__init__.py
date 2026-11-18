@@ -169,6 +169,7 @@ from lipipy.ml.metrics import (
     mean_squared_error,
     precision_recall_f1,
 )
+from lipipy.ml.mixture import GaussianMixture
 from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from lipipy.ml.svm import SVC
@@ -183,6 +184,7 @@ __all__ = [
     "ClassifierMixin",
     "DecisionTreeClassifier",
     "DecisionTreeRegressor",
+    "GaussianMixture",
     "GaussianNB",
     "GradientBoostingClassifier",
     "GradientBoostingRegressor",
