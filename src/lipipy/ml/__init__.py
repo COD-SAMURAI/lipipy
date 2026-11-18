@@ -150,7 +150,7 @@ Model selection, evaluation and preprocessing
 """
 
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
-from lipipy.ml.cluster import AgglomerativeClustering, KMeans
+from lipipy.ml.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from lipipy.ml.decomposition import PCA
 from lipipy.ml.discriminant import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from lipipy.ml.ensemble import (
@@ -175,6 +175,7 @@ from lipipy.ml.svm import SVC
 from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 
 __all__ = [
+    "DBSCAN",
     "PCA",
     "SVC",
     "AdaBoostClassifier",
