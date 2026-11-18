@@ -7,37 +7,39 @@ Catalog. ``[x]`` = implemented, ``[ ]`` = planned.
 
 Uninformed search
 -----------------
-[ ] Breadth-first, depth-first, depth-limited, iterative deepening
-[ ] Uniform-cost search (Dijkstra)
-[ ] Bidirectional search
+[x] Breadth-first, depth-first, depth-limited, iterative deepening
+[x] Uniform-cost search (Dijkstra)
+[x] Bidirectional search (breadth-first)
 
 Informed (heuristic) search
 ---------------------------
-[ ] Greedy best-first
-[ ] A*, IDA*, weighted A*
-[ ] Admissible/consistent heuristics, pattern databases
+[x] Greedy best-first
+[x] A*, IDA*, weighted A*
+[x] Admissible/consistent heuristics (Manhattan distance for sliding puzzles)
+[ ] Pattern databases
 
 Local search and metaheuristics
 -------------------------------
-[ ] Hill climbing (steepest, stochastic, random restart)
-[ ] Simulated annealing
+[x] Hill climbing (steepest, first-choice, random restart)
+[x] Simulated annealing
 [ ] Tabu search
-[ ] Genetic algorithms, genetic programming
+[x] Genetic algorithms
+[ ] Genetic programming
 [ ] Evolution strategies (CMA-ES), differential evolution
 [ ] Particle swarm optimization, ant colony optimization
 
 Adversarial search (games)
 --------------------------
-[ ] Minimax, alpha-beta pruning, expectiminimax
-[ ] Monte Carlo tree search (shared with lipipy.rl)
+[x] Minimax, alpha-beta pruning, expectiminimax
+[x] Monte Carlo tree search (UCT; shared with lipipy.rl)
 [ ] Counterfactual regret minimization (CFR) for imperfect-information games
 
 Constraint satisfaction
 -----------------------
-[ ] Backtracking search with MRV / degree / LCV heuristics
-[ ] Forward checking, arc consistency (AC-3)
-[ ] Min-conflicts local search
-[ ] SAT solving: DPLL, CDCL, WalkSAT
+[x] Backtracking search with MRV / degree / LCV heuristics
+[x] Forward checking, arc consistency (AC-3, MAC)
+[x] Min-conflicts local search
+[x] SAT solving: DPLL, CDCL, WalkSAT
 
 Logic and knowledge representation
 ----------------------------------
@@ -126,50 +128,50 @@ from lipipy.ai.search import (
 )
 
 __all__ = [
-    "ContinuousProblem",
-    "GAResult",
-    "LocalSearchProblem",
-    "LocalSearchResult",
-    "NQueensProblem",
-    "exp_schedule",
-    "genetic_algorithm",
-    "hill_climbing",
-    "simulated_annealing",
-    "ConnectFour",
-    "Game",
-    "GameResult",
-    "MCTSResult",
-    "Nim",
-    "TicTacToe",
-    "alphabeta",
-    "expectiminimax",
-    "mcts",
-    "minimax",
-    "CNF",
-    "SATResult",
-    "cdcl",
-    "dpll",
-    "parse_dimacs",
-    "walksat",
     "AC3Result",
+    "CNF",
     "CSP",
     "CSPResult",
+    "ConnectFour",
     "Constraint",
-    "ac3",
-    "all_different",
-    "backtracking_search",
-    "min_conflicts",
+    "ContinuousProblem",
+    "GAResult",
+    "Game",
+    "GameResult",
     "GraphProblem",
+    "LocalSearchProblem",
+    "LocalSearchResult",
+    "MCTSResult",
+    "NQueensProblem",
+    "Nim",
+    "SATResult",
     "SearchProblem",
     "SearchResult",
     "SlidingPuzzle",
+    "TicTacToe",
+    "ac3",
+    "all_different",
+    "alphabeta",
     "astar",
+    "backtracking_search",
     "bidirectional_bfs",
     "breadth_first",
+    "cdcl",
     "depth_first",
+    "dpll",
+    "exp_schedule",
+    "expectiminimax",
+    "genetic_algorithm",
     "greedy_best_first",
+    "hill_climbing",
     "ida_star",
     "iterative_deepening",
+    "mcts",
+    "min_conflicts",
+    "minimax",
+    "parse_dimacs",
+    "simulated_annealing",
     "uniform_cost",
+    "walksat",
     "weighted_astar",
 ]
