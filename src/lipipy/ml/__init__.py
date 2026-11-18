@@ -152,6 +152,7 @@ Model selection, evaluation and preprocessing
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
 from lipipy.ml.cluster import KMeans
 from lipipy.ml.decomposition import PCA
+from lipipy.ml.discriminant import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from lipipy.ml.ensemble import (
     GradientBoostingClassifier,
     GradientBoostingRegressor,
@@ -184,9 +185,11 @@ __all__ = [
     "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
+    "LinearDiscriminantAnalysis",
     "LinearRegression",
     "LogisticRegression",
     "PrecisionRecallF1",
+    "QuadraticDiscriminantAnalysis",
     "RandomForestClassifier",
     "RandomForestRegressor",
     "Ridge",
