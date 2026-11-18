@@ -169,10 +169,12 @@ from lipipy.ml.metrics import (
 )
 from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from lipipy.ml.svm import SVC
 from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 
 __all__ = [
     "PCA",
+    "SVC",
     "ClassifierMixin",
     "DecisionTreeClassifier",
     "DecisionTreeRegressor",
