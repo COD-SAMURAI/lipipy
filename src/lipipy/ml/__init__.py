@@ -27,16 +27,17 @@ Supervised learning: classification
 -----------------------------------
 [ ] Perceptron
 [x] Logistic regression (binary, multinomial / softmax)
-[ ] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
+[x] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
 [x] Naive Bayes: Gaussian
 [ ] Naive Bayes: multinomial, Bernoulli, complement
 [x] k-nearest neighbours classifier (brute force, chunked distances)
 [ ] k-nearest neighbours with KD-tree / ball tree
-[ ] Support vector machines (hard/soft margin, SMO solver)
-[ ] Kernel SVM (linear, polynomial, RBF, sigmoid kernels)
+[x] Support vector machines (soft margin, SMO solver with second-order working sets)
+[x] Kernel SVM (linear, polynomial, RBF, sigmoid kernels)
 [ ] Gaussian process classification
 [ ] Nearest centroid
-[ ] One-vs-rest, one-vs-one, error-correcting output codes
+[x] One-vs-one (inside SVC)
+[ ] One-vs-rest, error-correcting output codes
 
 Trees and ensembles
 -------------------
@@ -45,7 +46,8 @@ Trees and ensembles
 [ ] Bagging
 [x] Random forest
 [ ] Extremely randomized trees (Extra-Trees)
-[ ] AdaBoost (SAMME, SAMME.R)
+[x] AdaBoost (SAMME)
+[ ] AdaBoost SAMME.R
 [x] Gradient boosting machines (squared error, binary log loss)
 [ ] Gradient boosting: multiclass, Huber / quantile losses
 [ ] XGBoost-style boosting (second-order, regularized)
@@ -60,11 +62,12 @@ Unsupervised learning: clustering
 [x] k-means (Lloyd), k-means++
 [ ] Mini-batch k-means
 [ ] k-medoids (PAM)
-[ ] Hierarchical / agglomerative clustering (single, complete, average, Ward)
-[ ] DBSCAN, HDBSCAN, OPTICS
+[x] Hierarchical / agglomerative clustering (single, complete, average, Ward)
+[x] DBSCAN
+[ ] HDBSCAN, OPTICS
 [ ] Mean shift
 [ ] Spectral clustering
-[ ] Gaussian mixture models (EM algorithm)
+[x] Gaussian mixture models (EM algorithm)
 [ ] Affinity propagation
 [ ] BIRCH
 [ ] Fuzzy c-means
@@ -79,7 +82,7 @@ Dimensionality reduction and representation
 [ ] Singular value decomposition (truncated SVD / LSA)
 [ ] Independent component analysis (FastICA)
 [ ] Non-negative matrix factorization (NMF)
-[ ] Linear discriminant analysis as a projection
+[x] Linear discriminant analysis as a projection
 [ ] Multidimensional scaling (MDS)
 [ ] Isomap, locally linear embedding (LLE), Laplacian eigenmaps
 [ ] t-SNE
