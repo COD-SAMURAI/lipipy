@@ -38,16 +38,20 @@ Derivatives pricing
 [x] Binomial (Cox-Ross-Rubinstein) trees, European and American options
 [ ] Trinomial trees
 [x] Monte Carlo pricing with antithetic and control variates (European, chunked)
-[ ] Path-dependent options
-[ ] Heston stochastic volatility, Merton jump diffusion
+[x] Path-dependent options: arithmetic/geometric Asian, barriers (closed form and
+    Brownian-bridge Monte Carlo), floating-strike lookbacks
+[x] Heston stochastic volatility, Merton jump diffusion
 [ ] Finite-difference PDE pricing
-[ ] Bond math: yield, duration, convexity, yield-curve bootstrapping
+[x] Bond math: yield, duration, convexity, accrued interest, yield-curve bootstrapping,
+    Nelson-Siegel
 
 Time-series models for markets
 ------------------------------
-[ ] ARIMA / GARCH for returns and volatility
-[ ] Kalman filters for pairs trading / dynamic hedge ratios
-[ ] Cointegration tests (Engle-Granger, Johansen)
+[x] GARCH(p, q), GJR-GARCH(1, 1); ACF/PACF, Ljung-Box, AR(p) (Yule-Walker, OLS), ADF
+[ ] ARIMA / ARMA estimation
+[x] Kalman filters (Joseph form, RTS smoother) for pairs trading / dynamic hedge ratios
+[x] Cointegration test (Engle-Granger)
+[ ] Johansen cointegration test
 [ ] Regime switching (hidden Markov models)
 
 Trading and execution

@@ -225,3 +225,18 @@ def test_nelson_siegel_noisy_fit_is_a_least_squares_minimum():
         nelson_siegel_fit([1.0, 2.0], [0.01, 0.02])
     with pytest.raises(ValueError, match="positive"):
         nelson_siegel_fit([0.0, 1, 2, 3], [0.01] * 4)
+
+
+def test_yield_bracket_extremes():
+    # yields close to -compounding (huge prices) and very high yields (tiny prices)
+    for y in (-1.995, -0.9, 5.0, 40.0):
+        p = bond_price(100.0, 0.05, y, 3.0)
+        assert bond_yield(p, 100.0, 0.05, 3.0) == pytest.approx(y, rel=1e-9)
+    p = bond_price(100.0, 0.05, -0.9, 3.0, compounding="continuous")
+    assert bond_yield(p, 100.0, 0.05, 3.0, compounding="continuous") == pytest.approx(
+        -0.9, rel=1e-9
+    )
+    with pytest.raises(ValueError, match="too low"):
+        bond_yield(1e-300, 100.0, 0.05, 3.0)
+    with pytest.raises(ValueError, match="too high"):
+        bond_yield(1e300, 100.0, 0.05, 3.0)

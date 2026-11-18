@@ -8,7 +8,15 @@ import numpy as np
 import pytest
 
 from lipipy.bench import estimate_complexity
-from lipipy.finance import backtest, binomial_price, ledoit_wolf, monte_carlo_price
+from lipipy.finance import (
+    KalmanFilter,
+    arithmetic_asian_mc,
+    backtest,
+    binomial_price,
+    garch,
+    ledoit_wolf,
+    monte_carlo_price,
+)
 
 
 def _mc(n):
@@ -92,3 +100,51 @@ def test_backtest_time_is_linear_in_time_steps():
         repeats=3,
     )
     assert est.time_exponent == pytest.approx(1.0, abs=0.25)
+
+
+def test_asian_mc_memory_is_independent_of_paths():
+    """Declared space O(chunk_size): 8x more paths, same peak memory."""
+    est = estimate_complexity(
+        lambda n: arithmetic_asian_mc(
+            100.0, 100.0, 1.0, 0.05, 0.2, n_paths=int(n), random_state=0, chunk_size=24_000
+        ),
+        lambda n, rng: n,
+        sizes=(40_000, 80_000, 160_000, 320_000),
+        repeats=1,
+    )
+    assert est.space_exponent == pytest.approx(0.0, abs=0.1)
+
+
+@pytest.mark.complexity
+def test_kalman_filter_time_is_linear_in_length():
+    kf = KalmanFilter(np.eye(2), np.ones((1, 2)), 0.01 * np.eye(2), [[1.0]], np.zeros(2), np.eye(2))
+    est = estimate_complexity(
+        kf.filter, lambda n, rng: rng.normal(size=n), sizes=(1_000, 2_000, 4_000, 8_000), repeats=2
+    )
+    assert est.time_exponent == pytest.approx(1.0, abs=0.2)
+
+
+@pytest.mark.complexity
+def test_asian_mc_time_is_linear_in_paths():
+    est = estimate_complexity(
+        lambda n: arithmetic_asian_mc(100.0, 100.0, 1.0, 0.05, 0.2, n_paths=int(n), random_state=0),
+        lambda n, rng: n,
+        sizes=(100_000, 200_000, 400_000, 800_000),
+        repeats=3,
+    )
+    assert est.time_exponent == pytest.approx(1.0, abs=0.2)
+
+
+@pytest.mark.complexity
+def test_garch_likelihood_time_is_linear_in_length():
+    """One fit costs a bounded number of O(T) likelihood evaluations."""
+
+    def make(n, rng):
+        r, s2 = np.empty(n), 1e-4
+        for t in range(n):
+            r[t] = np.sqrt(s2) * rng.standard_normal()
+            s2 = 1e-6 + 0.08 * r[t] ** 2 + 0.9 * s2
+        return r
+
+    est = estimate_complexity(garch, make, sizes=(600, 1_200, 2_400), repeats=1)
+    assert est.time_exponent == pytest.approx(1.0, abs=0.35)
