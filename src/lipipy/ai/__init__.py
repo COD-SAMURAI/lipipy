@@ -85,6 +85,18 @@ from lipipy.ai.csp import (
     backtracking_search,
     min_conflicts,
 )
+from lipipy.ai.games import (
+    ConnectFour,
+    Game,
+    GameResult,
+    MCTSResult,
+    Nim,
+    TicTacToe,
+    alphabeta,
+    expectiminimax,
+    mcts,
+    minimax,
+)
 from lipipy.ai.sat import CNF, SATResult, cdcl, dpll, parse_dimacs, walksat
 from lipipy.ai.search import (
     GraphProblem,
@@ -103,6 +115,16 @@ from lipipy.ai.search import (
 )
 
 __all__ = [
+    "ConnectFour",
+    "Game",
+    "GameResult",
+    "MCTSResult",
+    "Nim",
+    "TicTacToe",
+    "alphabeta",
+    "expectiminimax",
+    "mcts",
+    "minimax",
     "CNF",
     "SATResult",
     "cdcl",
