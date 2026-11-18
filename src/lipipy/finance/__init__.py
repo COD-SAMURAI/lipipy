@@ -71,6 +71,17 @@ from lipipy.finance.exotics import (
     lookback_mc,
     merton_jump_price,
 )
+from lipipy.finance.fixed_income import (
+    BondAnalytics,
+    NelsonSiegelResult,
+    ZeroCurve,
+    accrued_interest,
+    bond_analytics,
+    bond_price,
+    bond_yield,
+    bootstrap_zero_curve,
+    nelson_siegel_fit,
+)
 from lipipy.finance.kalman import (
     FilterResult,
     HedgeRatioResult,
@@ -137,6 +148,15 @@ from lipipy.finance.timeseries import (
 from lipipy.finance.volatility import GarchResult, garch, gjr_garch
 
 __all__ = [
+    "BondAnalytics",
+    "NelsonSiegelResult",
+    "ZeroCurve",
+    "accrued_interest",
+    "bond_analytics",
+    "bond_price",
+    "bond_yield",
+    "bootstrap_zero_curve",
+    "nelson_siegel_fit",
     "arithmetic_asian_mc",
     "barrier_mc",
     "barrier_price",
