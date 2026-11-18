@@ -38,16 +38,20 @@ Derivatives pricing
 [x] Binomial (Cox-Ross-Rubinstein) trees, European and American options
 [ ] Trinomial trees
 [x] Monte Carlo pricing with antithetic and control variates (European, chunked)
-[ ] Path-dependent options
-[ ] Heston stochastic volatility, Merton jump diffusion
+[x] Path-dependent options: arithmetic/geometric Asian, barriers (closed form and
+    Brownian-bridge Monte Carlo), floating-strike lookbacks
+[x] Heston stochastic volatility, Merton jump diffusion
 [ ] Finite-difference PDE pricing
-[ ] Bond math: yield, duration, convexity, yield-curve bootstrapping
+[x] Bond math: yield, duration, convexity, accrued interest, yield-curve bootstrapping,
+    Nelson-Siegel
 
 Time-series models for markets
 ------------------------------
-[ ] ARIMA / GARCH for returns and volatility
-[ ] Kalman filters for pairs trading / dynamic hedge ratios
-[ ] Cointegration tests (Engle-Granger, Johansen)
+[x] GARCH(p, q), GJR-GARCH(1, 1); ACF/PACF, Ljung-Box, AR(p) (Yule-Walker, OLS), ADF
+[ ] ARIMA / ARMA estimation
+[x] Kalman filters (Joseph form, RTS smoother) for pairs trading / dynamic hedge ratios
+[x] Cointegration test (Engle-Granger)
+[ ] Johansen cointegration test
 [ ] Regime switching (hidden Markov models)
 
 Trading and execution
@@ -62,6 +66,33 @@ Trading and execution
 """
 
 from lipipy.finance.backtest import BacktestResult, backtest
+from lipipy.finance.exotics import (
+    arithmetic_asian_mc,
+    barrier_mc,
+    barrier_price,
+    geometric_asian_price,
+    heston_price,
+    lookback_mc,
+    merton_jump_price,
+)
+from lipipy.finance.fixed_income import (
+    BondAnalytics,
+    NelsonSiegelResult,
+    ZeroCurve,
+    accrued_interest,
+    bond_analytics,
+    bond_price,
+    bond_yield,
+    bootstrap_zero_curve,
+    nelson_siegel_fit,
+)
+from lipipy.finance.kalman import (
+    FilterResult,
+    HedgeRatioResult,
+    KalmanFilter,
+    SmootherResult,
+    dynamic_hedge_ratio,
+)
 from lipipy.finance.options import (
     Greeks,
     MonteCarloResult,
@@ -106,13 +137,58 @@ from lipipy.finance.risk import (
     sample_covariance,
     value_at_risk,
 )
+from lipipy.finance.timeseries import (
+    ADFResult,
+    ARResult,
+    CointegrationResult,
+    LjungBoxResult,
+    acf,
+    adf,
+    ar_fit,
+    engle_granger,
+    ljung_box,
+    pacf,
+)
+from lipipy.finance.volatility import GarchResult, garch, gjr_garch
 
 __all__ = [
+    "BondAnalytics",
+    "NelsonSiegelResult",
+    "ZeroCurve",
+    "accrued_interest",
+    "bond_analytics",
+    "bond_price",
+    "bond_yield",
+    "bootstrap_zero_curve",
+    "nelson_siegel_fit",
+    "arithmetic_asian_mc",
+    "barrier_mc",
+    "barrier_price",
+    "geometric_asian_price",
+    "heston_price",
+    "lookback_mc",
+    "merton_jump_price",
+    "FilterResult",
+    "HedgeRatioResult",
+    "KalmanFilter",
+    "SmootherResult",
+    "dynamic_hedge_ratio",
+    "ADFResult",
+    "ARResult",
+    "CointegrationResult",
+    "LjungBoxResult",
+    "acf",
+    "adf",
+    "ar_fit",
+    "engle_granger",
+    "ljung_box",
+    "pacf",
     "BacktestResult",
     "BlackLittermanResult",
     "CAPMResult",
     "DrawdownResult",
     "EfficientFrontier",
+    "GarchResult",
     "Greeks",
     "LedoitWolfResult",
     "MonteCarloResult",
@@ -130,6 +206,8 @@ __all__ = [
     "efficient_frontier",
     "ewma_covariance",
     "expected_shortfall",
+    "garch",
+    "gjr_garch",
     "implied_volatility",
     "information_ratio",
     "ledoit_wolf",
