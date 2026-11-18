@@ -154,6 +154,7 @@ from lipipy.ml.cluster import KMeans
 from lipipy.ml.decomposition import PCA
 from lipipy.ml.discriminant import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from lipipy.ml.ensemble import (
+    AdaBoostClassifier,
     GradientBoostingClassifier,
     GradientBoostingRegressor,
     RandomForestClassifier,
@@ -176,6 +177,7 @@ from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 __all__ = [
     "PCA",
     "SVC",
+    "AdaBoostClassifier",
     "ClassifierMixin",
     "DecisionTreeClassifier",
     "DecisionTreeRegressor",
