@@ -97,6 +97,17 @@ from lipipy.ai.games import (
     mcts,
     minimax,
 )
+from lipipy.ai.local import (
+    ContinuousProblem,
+    GAResult,
+    LocalSearchProblem,
+    LocalSearchResult,
+    NQueensProblem,
+    exp_schedule,
+    genetic_algorithm,
+    hill_climbing,
+    simulated_annealing,
+)
 from lipipy.ai.sat import CNF, SATResult, cdcl, dpll, parse_dimacs, walksat
 from lipipy.ai.search import (
     GraphProblem,
@@ -115,6 +126,15 @@ from lipipy.ai.search import (
 )
 
 __all__ = [
+    "ContinuousProblem",
+    "GAResult",
+    "LocalSearchProblem",
+    "LocalSearchResult",
+    "NQueensProblem",
+    "exp_schedule",
+    "genetic_algorithm",
+    "hill_climbing",
+    "simulated_annealing",
     "ConnectFour",
     "Game",
     "GameResult",
