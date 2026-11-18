@@ -27,16 +27,17 @@ Supervised learning: classification
 -----------------------------------
 [ ] Perceptron
 [x] Logistic regression (binary, multinomial / softmax)
-[ ] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
+[x] Linear discriminant analysis (LDA), quadratic discriminant analysis (QDA)
 [x] Naive Bayes: Gaussian
 [ ] Naive Bayes: multinomial, Bernoulli, complement
 [x] k-nearest neighbours classifier (brute force, chunked distances)
 [ ] k-nearest neighbours with KD-tree / ball tree
-[ ] Support vector machines (hard/soft margin, SMO solver)
-[ ] Kernel SVM (linear, polynomial, RBF, sigmoid kernels)
+[x] Support vector machines (soft margin, SMO solver with second-order working sets)
+[x] Kernel SVM (linear, polynomial, RBF, sigmoid kernels)
 [ ] Gaussian process classification
 [ ] Nearest centroid
-[ ] One-vs-rest, one-vs-one, error-correcting output codes
+[x] One-vs-one (inside SVC)
+[ ] One-vs-rest, error-correcting output codes
 
 Trees and ensembles
 -------------------
@@ -45,7 +46,8 @@ Trees and ensembles
 [ ] Bagging
 [x] Random forest
 [ ] Extremely randomized trees (Extra-Trees)
-[ ] AdaBoost (SAMME, SAMME.R)
+[x] AdaBoost (SAMME)
+[ ] AdaBoost SAMME.R
 [x] Gradient boosting machines (squared error, binary log loss)
 [ ] Gradient boosting: multiclass, Huber / quantile losses
 [ ] XGBoost-style boosting (second-order, regularized)
@@ -60,11 +62,12 @@ Unsupervised learning: clustering
 [x] k-means (Lloyd), k-means++
 [ ] Mini-batch k-means
 [ ] k-medoids (PAM)
-[ ] Hierarchical / agglomerative clustering (single, complete, average, Ward)
-[ ] DBSCAN, HDBSCAN, OPTICS
+[x] Hierarchical / agglomerative clustering (single, complete, average, Ward)
+[x] DBSCAN
+[ ] HDBSCAN, OPTICS
 [ ] Mean shift
 [ ] Spectral clustering
-[ ] Gaussian mixture models (EM algorithm)
+[x] Gaussian mixture models (EM algorithm)
 [ ] Affinity propagation
 [ ] BIRCH
 [ ] Fuzzy c-means
@@ -79,7 +82,7 @@ Dimensionality reduction and representation
 [ ] Singular value decomposition (truncated SVD / LSA)
 [ ] Independent component analysis (FastICA)
 [ ] Non-negative matrix factorization (NMF)
-[ ] Linear discriminant analysis as a projection
+[x] Linear discriminant analysis as a projection
 [ ] Multidimensional scaling (MDS)
 [ ] Isomap, locally linear embedding (LLE), Laplacian eigenmaps
 [ ] t-SNE
@@ -150,9 +153,11 @@ Model selection, evaluation and preprocessing
 """
 
 from lipipy.ml._base import ClassifierMixin, TransformerMixin
-from lipipy.ml.cluster import KMeans
+from lipipy.ml.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from lipipy.ml.decomposition import PCA
+from lipipy.ml.discriminant import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from lipipy.ml.ensemble import (
+    AdaBoostClassifier,
     GradientBoostingClassifier,
     GradientBoostingRegressor,
     RandomForestClassifier,
@@ -167,24 +172,33 @@ from lipipy.ml.metrics import (
     mean_squared_error,
     precision_recall_f1,
 )
+from lipipy.ml.mixture import GaussianMixture
 from lipipy.ml.naive_bayes import GaussianNB
 from lipipy.ml.neighbors import KNeighborsClassifier, KNeighborsRegressor
+from lipipy.ml.svm import SVC
 from lipipy.ml.tree import DecisionTreeClassifier, DecisionTreeRegressor, Tree
 
 __all__ = [
+    "DBSCAN",
     "PCA",
+    "SVC",
+    "AdaBoostClassifier",
+    "AgglomerativeClustering",
     "ClassifierMixin",
     "DecisionTreeClassifier",
     "DecisionTreeRegressor",
+    "GaussianMixture",
     "GaussianNB",
     "GradientBoostingClassifier",
     "GradientBoostingRegressor",
     "KMeans",
     "KNeighborsClassifier",
     "KNeighborsRegressor",
+    "LinearDiscriminantAnalysis",
     "LinearRegression",
     "LogisticRegression",
     "PrecisionRecallF1",
+    "QuadraticDiscriminantAnalysis",
     "RandomForestClassifier",
     "RandomForestRegressor",
     "Ridge",

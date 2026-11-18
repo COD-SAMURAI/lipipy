@@ -43,6 +43,13 @@ def test_transformer_mixin_fit_transform_calls_fit_then_transform():
         "KMeans",
         "PCA",
         "GaussianNB",
+        "SVC",
+        "LinearDiscriminantAnalysis",
+        "QuadraticDiscriminantAnalysis",
+        "AdaBoostClassifier",
+        "AgglomerativeClustering",
+        "DBSCAN",
+        "GaussianMixture",
     ],
 )
 def test_estimators_exported_registered_and_documented(name):
